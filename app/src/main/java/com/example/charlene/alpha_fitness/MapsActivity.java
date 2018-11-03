@@ -65,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-
+    //" nainai nia
     /**
      * Saves the state of the map when the activity is paused.
      */
