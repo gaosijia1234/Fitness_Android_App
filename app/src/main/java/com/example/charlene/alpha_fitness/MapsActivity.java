@@ -1,4 +1,4 @@
-package com.example.charlene.alpha_fitness.activity;
+package com.example.charlene.alpha_fitness;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,8 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.charlene.alpha_fitness.MyService;
-import com.example.charlene.alpha_fitness.R;
+import com.example.charlene.alpha_fitness.activity.ProfileScreenActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.fitness.data.DataPoint;
