@@ -50,7 +50,7 @@
             android:process=":anotherProc"
             android:exported="true" />
 
-        <activity android:name=".ProfileScreenActivity"></activity>
+        <activity android:name=".activity.ProfileScreenActivity"></activity>
     </application>
 
 </manifest>
