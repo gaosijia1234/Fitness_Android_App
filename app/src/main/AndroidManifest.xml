@@ -47,6 +47,7 @@
         <service
             android:name=".MyService"
             android:enabled="true"
+            android:process=":anotherProc"
             android:exported="true" />
 
         <activity android:name=".ProfileScreenActivity"></activity>
