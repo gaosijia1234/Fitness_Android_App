@@ -130,50 +130,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         updateLocationUI();
 
 
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED
-//                && ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            Log.i("MYTAG", "check map!!!");
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
-//                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-//            return;
-//        }
-//
-//        Location location = locationManager.getLastKnownLocation(locationProvider);
-//
-//
-//        String label = "Address: ";
-//        List<Address> addresses;
-//
-//        try {
-//            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-//            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
-//
-//            if( addresses != null) {
-//                Address address = addresses.get(0);
-//                StringBuilder stringBuilder = new StringBuilder("");
-//                for (int i=0 ; i<address.getMaxAddressLineIndex(); i++) {
-//                    stringBuilder.append(address.getAddressLine(i)).append("/");
-//                }
-//
-//                label = label + stringBuilder.toString();
-//            }
-//
-//        }catch (IOException e) {
-//            Log.i("MYTAG", "noooo ");
-//
-//        }
-//
-//        LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
-//        mMap.addMarker(new MarkerOptions().position(here).title(label));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(here));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.i("MYTAG", "check map!!!");
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+            return;
+        }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        Location location = locationManager.getLastKnownLocation(locationProvider);
+
+
+        String label = "Address: ";
+        List<Address> addresses;
+
+        try {
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
+
+            if( addresses != null) {
+                Address address = addresses.get(0);
+                StringBuilder stringBuilder = new StringBuilder("");
+                for (int i=0 ; i<address.getMaxAddressLineIndex(); i++) {
+                    stringBuilder.append(address.getAddressLine(i)).append("/");
+                }
+
+                label = label + stringBuilder.toString();
+            }
+
+        }catch (IOException e) {
+            Log.i("MYTAG", "noooo ");
+
+        }
+
+        LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(here).title(label));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(here));
+
+//        // Add a marker in Sydney and move the camera
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     /**
