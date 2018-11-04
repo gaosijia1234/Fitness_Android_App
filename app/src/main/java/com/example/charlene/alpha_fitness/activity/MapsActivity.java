@@ -54,6 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,9 +64,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        findViewById(R.id.start_workout_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Button workBtn =findViewById(R.id.start_workout_button);
+
+                if (workBtn.getText().toString().matches("Start Workout")) {
+                    startService(new Intent(MapsActivity.this, MyService.class));
+                    workBtn.setText("Stop Workout");
+                    return;
+                }
+
+                if (workBtn.getText().toString().matches("Stop Workout")) {
+                    stopService(new Intent(MapsActivity.this, MyService.class));
+                    workBtn.setText("Start Workout");
+                    return;
+                }
+
+            }
+        });
     }
 
-    //" nainai nia
+
     /**
      * Saves the state of the map when the activity is paused.
      */
@@ -84,23 +105,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    public void startWorkoutBtnClick(View view){
 
-        Button workBtn =findViewById(R.id.start_workout_button);
-
-        if (workBtn.getText().toString().matches("Start Workout")) {
-            startService(new Intent(MapsActivity.this, MyService.class));
-            workBtn.setText("Stop Workout");
-            return;
-        }
-
-        if (workBtn.getText().toString().matches("Stop Workout")) {
-            stopService(new Intent(MapsActivity.this, MyService.class));
-            workBtn.setText("Start Workout");
-            return;
-        }
-
-    }
 
     /**
      * Manipulates the map once available.
