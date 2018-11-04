@@ -1,9 +1,12 @@
-package com.example.charlene.alpha_fitness;
+package com.example.charlene.alpha_fitness.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
@@ -16,7 +19,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.charlene.alpha_fitness.activity.ProfileScreenActivity;
+import com.example.charlene.alpha_fitness.MyService;
+import com.example.charlene.alpha_fitness.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.fitness.data.DataPoint;
@@ -27,6 +31,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,OnDataPointListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -155,7 +163,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }catch (IOException e) {
             Log.i("MYTAG", "noooo ");
-
         }
 
         LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
