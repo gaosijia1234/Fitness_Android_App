@@ -10,15 +10,17 @@ public class Workout {
     private double calories;
     private Duration duration;
     private double aveVelocity;
-    private ArrayList<Double> velocityRecords;
+    private double maxVelocity;
+    private double minVelocity;
 
-    public Workout(Date date, double distance, double calories, Duration duration, double aveVelocity, ArrayList<Double> velocityRecords) {
+    public Workout(Date date, double distance, double calories, Duration duration, double aveVelocity, double maxVelocity, double minVelocity) {
         this.date = date;
         this.distance = distance;
         this.calories = calories;
         this.duration = duration;
         this.aveVelocity = aveVelocity;
-        this.velocityRecords = velocityRecords;
+        this.maxVelocity = maxVelocity;
+        this.minVelocity = minVelocity;
     }
 
     public Date getDate() {
@@ -61,12 +63,20 @@ public class Workout {
         this.aveVelocity = aveVelocity;
     }
 
-    public ArrayList<Double> getVelocityRecords() {
-        return velocityRecords;
+    public double getMaxVelocity() {
+        return maxVelocity;
     }
 
-    public void setVelocityRecords(ArrayList<Double> velocityRecords) {
-        this.velocityRecords = velocityRecords;
+    public void setMaxVelocity(double maxVelocity) {
+        this.maxVelocity = maxVelocity;
+    }
+
+    public double getMinVelocity() {
+        return minVelocity;
+    }
+
+    public void setMinVelocity(double minVelocity) {
+        this.minVelocity = minVelocity;
     }
 
     @Override
@@ -77,9 +87,8 @@ public class Workout {
                 ", calories=" + calories +
                 ", duration=" + duration +
                 ", aveVelocity=" + aveVelocity +
-                ", velocityRecords=" + velocityRecords +
+                ", maxVelocity=" + maxVelocity +
+                ", minVelocity=" + minVelocity +
                 '}';
     }
-
-
 }
