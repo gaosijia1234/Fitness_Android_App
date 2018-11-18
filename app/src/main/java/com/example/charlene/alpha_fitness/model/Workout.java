@@ -1,19 +1,15 @@
 package com.example.charlene.alpha_fitness.model;
 
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Date;
-
 public class Workout {
-    private Date date;
+    private String date;
     private double distance;
     private double calories;
-    private Duration duration;
+    private double duration;
     private double aveVelocity;
     private double maxVelocity;
     private double minVelocity;
 
-    public Workout(Date date, double distance, double calories, Duration duration, double aveVelocity, double maxVelocity, double minVelocity) {
+    public Workout(String date, double distance, double calories, double duration, double aveVelocity, double maxVelocity, double minVelocity) {
         this.date = date;
         this.distance = distance;
         this.calories = calories;
@@ -23,11 +19,11 @@ public class Workout {
         this.minVelocity = minVelocity;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 
@@ -47,11 +43,11 @@ public class Workout {
         this.calories = calories;
     }
 
-    public Duration getDuration() {
+    public double getDuration() {
         return duration;
     }
 
-    public void setDuration(Duration duration) {
+    public void setDuration(double duration) {
         this.duration = duration;
     }
 

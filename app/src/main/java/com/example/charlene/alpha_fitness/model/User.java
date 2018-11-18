@@ -2,28 +2,28 @@ package com.example.charlene.alpha_fitness.model;
 
 public class User {
     private String username;
-    private Gender gender;
+    private String gender;
     private double weight;
 
-    public User(String username, Gender gender, double weight) {
+    public User(java.lang.String username, String gender, double weight) {
         this.username = username;
         this.gender = gender;
         this.weight = weight;
     }
 
-    public String getUsername() {
+    public java.lang.String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(java.lang.String username) {
         this.username = username;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -36,7 +36,7 @@ public class User {
     }
 
     @Override
-    public String toString() {
+    public java.lang.String toString() {
         return "User{" +
                 "username='" + username + '\'' +
                 ", gender=" + gender +
@@ -45,7 +45,3 @@ public class User {
     }
 }
 
-enum Gender{
-    FEMALE,
-    MALE
-}

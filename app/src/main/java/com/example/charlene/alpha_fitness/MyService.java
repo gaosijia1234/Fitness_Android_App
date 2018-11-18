@@ -1,7 +1,5 @@
 package com.example.charlene.alpha_fitness;
 
-
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
