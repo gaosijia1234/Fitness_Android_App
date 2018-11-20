@@ -1,9 +1,17 @@
 package com.example.charlene.alpha_fitness.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.example.charlene.alpha_fitness.model.User;
+import com.example.charlene.alpha_fitness.model.Workout;
+
+import java.util.ArrayList;
+
 
 public class DatabaseHelper extends SQLiteOpenHelper{
 
@@ -68,7 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db){
         String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_USER +
                 "(" +
-                ATTRIBUTE_USER_ID + " INT NOT NULL, " +
+                ATTRIBUTE_USER_ID + " BIGINT NOT NULL, " +
                 ATTRIBUTE_USER_NAME + " VARCHAR(255) NOT NULL, " +
                 ATTRIBUTE_USER_GENDER + " VARCHAR(255) NOT NULL, " +
                 ATTRIBUTE_USER_WEIGHT + " DOUBLE NOT NULL, " +
@@ -77,7 +85,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         String CREATE_WORKOUT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_WORKOUT +
                 "(" +
                 ATTRIBUTE_WORKOUT_ID + " INT NOT NULL, " +
-                ATTRIBUTE_WORKOUT_DATE + " DATETIME NOT NULL, " +
+                ATTRIBUTE_WORKOUT_DATE + " VARCHAR(255) NOT NULL, " +
                 ATTRIBUTE_WORKOUT_DISTANCE + " DOUBLE NOT NULL, " +
                 ATTRIBUTE_WORKOUT_CALORIES + " DOUBLE NOT NULL, " +
                 ATTRIBUTE_WORKOUT_DURATION + " DOUBLE NOT NULL, " +
@@ -106,4 +114,160 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             onCreate(db);
         }
     }
+
+    /*--------------------------------Table User---------------------------------------*/
+
+    public void addUser(User user) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.beginTransaction();
+        try{
+            ContentValues values = new ContentValues();
+            values.put(ATTRIBUTE_USER_ID, 0);
+            values.put(ATTRIBUTE_USER_NAME, user.getUsername());
+            values.put(ATTRIBUTE_USER_GENDER, user.getGender());
+            values.put(ATTRIBUTE_USER_WEIGHT, user.getWeight());
+
+            db.insertOrThrow(TABLE_USER, null, values);
+            db.setTransactionSuccessful();
+
+        }catch (Exception e){
+            Log.d(TAG,"Error while trying to add a user in USER_TABLE in database");
+        }finally {
+            db.endTransaction();
+        }
+    }
+
+    private void updateUser(User user) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+
+        try{
+            ContentValues values = new ContentValues();
+            values.put(ATTRIBUTE_USER_ID, 0);
+            values.put(ATTRIBUTE_USER_NAME, user.getUsername());
+            values.put(ATTRIBUTE_USER_GENDER, user.getGender());
+            values.put(ATTRIBUTE_USER_WEIGHT, user.getWeight());
+
+            db.update(TABLE_USER, values,
+                    ATTRIBUTE_USER_NAME + " = ? AND "
+                    + ATTRIBUTE_USER_GENDER + " = ? AND "
+                    + ATTRIBUTE_USER_WEIGHT + " = ?",
+                    new String[]{user.getUsername(), user.getGender(), Double.toString(user.getWeight())});
+            db.setTransactionSuccessful();
+
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to update username in user table in database");
+        }finally {
+            db.endTransaction();
+        }
+    }
+
+    private void deleteUser(String userName){
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.beginTransaction();
+        try{
+            db.delete(TABLE_USER, ATTRIBUTE_USER_NAME + " = ?",
+                    new String[]{userName});
+            db.setTransactionSuccessful();
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to delete a user from user table by userName in database");
+        }finally {
+            db.endTransaction();
+        }
+    }
+
+    /*--------------------------------Table Workout---------------------------------------*/
+
+    public void addWorkout(Workout workout) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+
+        try{
+            ContentValues values = new ContentValues();
+            values.put(ATTRIBUTE_WORKOUT_ID, 0);
+            values.put(ATTRIBUTE_WORKOUT_DATE, workout.getDate());
+            values.put(ATTRIBUTE_WORKOUT_DISTANCE, workout.getDistance());
+            values.put(ATTRIBUTE_WORKOUT_CALORIES, workout.getCalories());
+            values.put(ATTRIBUTE_WORKOUT_DURATION, workout.getDuration());
+            values.put(ATTRIBUTE_WORKOUT_AVE_VELOCITY, workout.getAveVelocity());
+            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
+            values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
+
+            db.insertOrThrow(TABLE_WORKOUT, null, values);
+            db.setTransactionSuccessful();
+
+        }catch (Exception e){
+            Log.d(TAG,"Error while trying to add a user in WORKOUT_TABLE in database");
+        }finally {
+            db.endTransaction();
+        }
+
+        getWorkoutAverage();
+    }
+
+//    private void updateWorkout(Workout workout) {
+//        SQLiteDatabase db = getWritableDatabase();
+//        db.beginTransaction();
+//
+//        try{
+//            ContentValues values = new ContentValues();
+//            values.put(ATTRIBUTE_WORKOUT_ID, 0);
+//            values.put(ATTRIBUTE_WORKOUT_DATE, workout.getDate());
+//            values.put(ATTRIBUTE_WORKOUT_DISTANCE, workout.getDistance());
+//            values.put(ATTRIBUTE_WORKOUT_CALORIES, workout.getCalories());
+//            values.put(ATTRIBUTE_WORKOUT_DURATION, workout.getDuration());
+//            values.put(ATTRIBUTE_WORKOUT_AVE_VELOCITY, workout.getAveVelocity());
+//            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
+//            values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
+//
+//            db.update(TABLE_WORKOUT, values,
+//                    ATTRIBUTE_WORKOUT_DATE + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_DISTANCE + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_CALORIES + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_DURATION + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_AVE_VELOCITY + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_MAX_VELOCITY + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_MIN_VELOCITY + " = ?",
+//                    new String[]{workout.getDate(), Double.toString(workout.getDistance()),
+//                            Double.toString(workout.getCalories()), Double.toString(workout.getDuration()),
+//                            Double.toString(workout.getAveVelocity()), Double.toString(workout.getMaxVelocity()),
+//                            Double.toString(workout.getMinVelocity())});
+//            db.setTransactionSuccessful();
+//
+//        }catch (Exception e){
+//            Log.d(TAG, "Error while trying to update username in user table in database");
+//        }finally {
+//            db.endTransaction();
+//        }
+//    }
+
+    public String[] getWorkoutAverage(){
+        return new String[]{"2.4km", "1h34min","2 times", "1,000 Cal"};
+    }
+
+    public String[] getWorkoutAllTime(){
+        return new String[]{"1548.4km", "1day23hr","112 times", "410,000 Cal"};
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

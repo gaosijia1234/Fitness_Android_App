@@ -2,10 +2,10 @@ package com.example.charlene.alpha_fitness.model;
 
 public class User {
     private String username;
-    private Gender gender;
+    private String gender;
     private double weight;
 
-    public User(String username, Gender gender, double weight) {
+    public User(String username, String gender, double weight) {
         this.username = username;
         this.gender = gender;
         this.weight = weight;
@@ -19,11 +19,11 @@ public class User {
         this.username = username;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
@@ -45,7 +45,3 @@ public class User {
     }
 }
 
-enum Gender{
-    FEMALE,
-    MALE
-}
