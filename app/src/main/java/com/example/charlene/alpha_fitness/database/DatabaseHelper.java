@@ -2,12 +2,15 @@ package com.example.charlene.alpha_fitness.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.example.charlene.alpha_fitness.model.User;
 import com.example.charlene.alpha_fitness.model.Workout;
+
+import java.util.ArrayList;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper{
@@ -179,8 +182,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     public void addWorkout(Workout workout) {
         SQLiteDatabase db = getWritableDatabase();
-
         db.beginTransaction();
+
         try{
             ContentValues values = new ContentValues();
             values.put(ATTRIBUTE_WORKOUT_ID, 0);
@@ -200,42 +203,52 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         }finally {
             db.endTransaction();
         }
+
+        getWorkoutAverage();
     }
 
-    private void updateWorkout(Workout workout) {
-        SQLiteDatabase db = getWritableDatabase();
-        db.beginTransaction();
+//    private void updateWorkout(Workout workout) {
+//        SQLiteDatabase db = getWritableDatabase();
+//        db.beginTransaction();
+//
+//        try{
+//            ContentValues values = new ContentValues();
+//            values.put(ATTRIBUTE_WORKOUT_ID, 0);
+//            values.put(ATTRIBUTE_WORKOUT_DATE, workout.getDate());
+//            values.put(ATTRIBUTE_WORKOUT_DISTANCE, workout.getDistance());
+//            values.put(ATTRIBUTE_WORKOUT_CALORIES, workout.getCalories());
+//            values.put(ATTRIBUTE_WORKOUT_DURATION, workout.getDuration());
+//            values.put(ATTRIBUTE_WORKOUT_AVE_VELOCITY, workout.getAveVelocity());
+//            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
+//            values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
+//
+//            db.update(TABLE_WORKOUT, values,
+//                    ATTRIBUTE_WORKOUT_DATE + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_DISTANCE + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_CALORIES + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_DURATION + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_AVE_VELOCITY + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_MAX_VELOCITY + " = ? AND "
+//                            + ATTRIBUTE_WORKOUT_MIN_VELOCITY + " = ?",
+//                    new String[]{workout.getDate(), Double.toString(workout.getDistance()),
+//                            Double.toString(workout.getCalories()), Double.toString(workout.getDuration()),
+//                            Double.toString(workout.getAveVelocity()), Double.toString(workout.getMaxVelocity()),
+//                            Double.toString(workout.getMinVelocity())});
+//            db.setTransactionSuccessful();
+//
+//        }catch (Exception e){
+//            Log.d(TAG, "Error while trying to update username in user table in database");
+//        }finally {
+//            db.endTransaction();
+//        }
+//    }
 
-        try{
-            ContentValues values = new ContentValues();
-            values.put(ATTRIBUTE_WORKOUT_ID, 0);
-            values.put(ATTRIBUTE_WORKOUT_DATE, workout.getDate());
-            values.put(ATTRIBUTE_WORKOUT_DISTANCE, workout.getDistance());
-            values.put(ATTRIBUTE_WORKOUT_CALORIES, workout.getCalories());
-            values.put(ATTRIBUTE_WORKOUT_DURATION, workout.getDuration());
-            values.put(ATTRIBUTE_WORKOUT_AVE_VELOCITY, workout.getAveVelocity());
-            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
-            values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
+    public String[] getWorkoutAverage(){
+        return new String[]{"2.4km", "1h34min","2 times", "1,000 Cal"};
+    }
 
-            db.update(TABLE_WORKOUT, values,
-                    ATTRIBUTE_WORKOUT_DATE + " = ? AND "
-                            + ATTRIBUTE_WORKOUT_DISTANCE + " = ? AND "
-                            + ATTRIBUTE_WORKOUT_CALORIES + " = ? AND "
-                            + ATTRIBUTE_WORKOUT_DURATION + " = ? AND "
-                            + ATTRIBUTE_WORKOUT_AVE_VELOCITY + " = ? AND "
-                            + ATTRIBUTE_WORKOUT_MAX_VELOCITY + " = ? AND "
-                            + ATTRIBUTE_WORKOUT_MIN_VELOCITY + " = ?",
-                    new String[]{workout.getDate(), Double.toString(workout.getDistance()),
-                            Double.toString(workout.getCalories()), Double.toString(workout.getDuration()),
-                            Double.toString(workout.getAveVelocity()), Double.toString(workout.getMaxVelocity()),
-                            Double.toString(workout.getMinVelocity())});
-            db.setTransactionSuccessful();
-
-        }catch (Exception e){
-            Log.d(TAG, "Error while trying to update username in user table in database");
-        }finally {
-            db.endTransaction();
-        }
+    public String[] getWorkoutAllTime(){
+        return new String[]{"1548.4km", "1day23hr","112 times", "410,000 Cal"};
     }
 
 }

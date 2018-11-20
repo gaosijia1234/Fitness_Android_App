@@ -127,6 +127,7 @@
                 android:textStyle="bold" />
 
             <ListView
+                android:id="@+id/ListViewAverage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
@@ -149,6 +150,7 @@
                 android:textStyle="bold" />
 
             <ListView
+                android:id="@+id/ListViewAllTime"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>

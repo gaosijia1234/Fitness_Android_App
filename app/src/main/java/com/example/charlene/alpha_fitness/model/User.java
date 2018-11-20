@@ -5,17 +5,17 @@ public class User {
     private String gender;
     private double weight;
 
-    public User(java.lang.String username, String gender, double weight) {
+    public User(String username, String gender, double weight) {
         this.username = username;
         this.gender = gender;
         this.weight = weight;
     }
 
-    public java.lang.String getUsername() {
+    public String getUsername() {
         return username;
     }
 
-    public void setUsername(java.lang.String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
 
@@ -36,7 +36,7 @@ public class User {
     }
 
     @Override
-    public java.lang.String toString() {
+    public String toString() {
         return "User{" +
                 "username='" + username + '\'' +
                 ", gender=" + gender +

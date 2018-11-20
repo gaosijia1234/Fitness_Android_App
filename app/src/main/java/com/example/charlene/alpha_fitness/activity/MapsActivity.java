@@ -52,9 +52,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,9 +101,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(newProfielScreenActivity);
     }
 
-
-
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -152,32 +146,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String label = "Address: ";
         List<Address> addresses;
 
-        try {
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
+//        try {
+//            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+//            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
+//
+//            if( addresses != null) {
+//                Address address = addresses.get(0);
+//                StringBuilder stringBuilder = new StringBuilder("");
+//                for (int i=0 ; i<address.getMaxAddressLineIndex(); i++) {
+//                    stringBuilder.append(address.getAddressLine(i)).append("/");
+//                }
+//
+//                label = label + stringBuilder.toString();
+//            }
+//
+//        }catch (IOException e) {
+//            Log.i("MYTAG", "noooo ");
+//        }
+//
+//        LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
+//        mMap.addMarker(new MarkerOptions().position(here).title(label));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(here));
 
-            if( addresses != null) {
-                Address address = addresses.get(0);
-                StringBuilder stringBuilder = new StringBuilder("");
-                for (int i=0 ; i<address.getMaxAddressLineIndex(); i++) {
-                    stringBuilder.append(address.getAddressLine(i)).append("/");
-                }
-
-                label = label + stringBuilder.toString();
-            }
-
-        }catch (IOException e) {
-            Log.i("MYTAG", "noooo ");
-        }
-
-        LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(here).title(label));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(here));
-
-//        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        // Add a marker in Sydney and move the camera
+        LatLng sydney = new LatLng(-34, 151);
+        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     /**
