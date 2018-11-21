@@ -63,13 +63,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        db = DatabaseHelper.getInstance(this);
-        // ************************* unchecked *************************
-        // mock data to checkout addWorkout in db,
-        // this code should be inside of startBtn onclick function(last function in this page),
-        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,0.1);
-        // db should have the mock data
-        db.addWorkout(workout1);
+        //
+//        db = DatabaseHelper.getInstance(this);
+//        // ************************* unchecked *************************
+//        // mock data to checkout addWorkout in db,
+//        // this code should be inside of startBtn onclick function(last function in this page),
+//        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,0.1);
+//        // db should have the mock data
+//        db.addWorkout(workout1);
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
