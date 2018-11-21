@@ -66,12 +66,11 @@ public class Workout {
     }
 
     public double getMaxVelocity() {
-        maxVelocity = 0.0;
-        double current = distance / duration;
-        if (current > maxVelocity){
-            maxVelocity = current;
+        double max = getMaxVelocity();
+        if (maxVelocity > max){
+            max = maxVelocity;
         }
-        return maxVelocity;
+        return max;
     }
 
     public void setMaxVelocity(double maxVelocity) {
@@ -79,12 +78,11 @@ public class Workout {
     }
 
     public double getMinVelocity() {
-        minVelocity = Double.MAX_VALUE;
-        double current = distance / duration;
-        if (current < minVelocity){
-            minVelocity = current;
+        double min = getMinVelocity();
+        if (minVelocity < min){
+            min = minVelocity;
         }
-        return minVelocity;
+        return min;
     }
 
     public void setMinVelocity(double minVelocity) {
