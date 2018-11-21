@@ -21,6 +21,8 @@ import android.widget.Button;
 
 import com.example.charlene.alpha_fitness.MyService;
 import com.example.charlene.alpha_fitness.R;
+import com.example.charlene.alpha_fitness.database.DatabaseHelper;
+import com.example.charlene.alpha_fitness.model.Workout;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.fitness.data.DataPoint;
@@ -52,10 +54,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
+    private DatabaseHelper db;
+    private Workout workout;  // to call setter method,
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        db = DatabaseHelper.getInstance(this);
+        // ************************* unchecked *************************
+        // mock data to checkout addWorkout in db,
+        // this code should be inside of startBtn onclick function(last function in this page),
+        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,0.1);
+        // db should have the mock data
+        db.addWorkout(workout1);
+
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -82,7 +98,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
     }
-
 
     /**
      * Saves the state of the map when the activity is paused.
@@ -259,6 +274,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onDataPoint(DataPoint dataPoint) {
+
+    }
+
+    public void start_workout_button_Onclick(View view){
+        // startBtn, time start from 0, for every 5 minutes, call setter to change the max and min, update the object
+
+        // get current date
+
+        // from Google API, get distance
+
+        // get duration
+
+        // after hit this btn again, times += 1
+
+        // calculate calories according to the time and distance
+
+        // average velocity
+
+        // max velocity
+
+        // min velocity
+
+        // after all done, update workout object
+        // ************************* unchecked *************************
+        // mock data to checkout addWorkout in db
+        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,0.1);
+        // db should have the mock data
+        db.addWorkout(workout1);
 
     }
 }

@@ -76,23 +76,21 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase db){
         String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_USER +
                 "(" +
-                ATTRIBUTE_USER_ID + " BIGINT NOT NULL, " +
+                ATTRIBUTE_USER_ID + " INT PRIMARY KEY AUTOINCREMENT, " +
                 ATTRIBUTE_USER_NAME + " VARCHAR(255) NOT NULL, " +
                 ATTRIBUTE_USER_GENDER + " VARCHAR(255) NOT NULL, " +
-                ATTRIBUTE_USER_WEIGHT + " DOUBLE NOT NULL, " +
-                "PRIMARY KEY (" + ATTRIBUTE_USER_ID + ")" +
+                ATTRIBUTE_USER_WEIGHT + " DOUBLE NOT NULL" +
                 ")";
         String CREATE_WORKOUT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_WORKOUT +
                 "(" +
-                ATTRIBUTE_WORKOUT_ID + " INT NOT NULL, " +
+                ATTRIBUTE_WORKOUT_ID + " INT PRIMARY KEY AUTOINCREMENT, " +
                 ATTRIBUTE_WORKOUT_DATE + " VARCHAR(255) NOT NULL, " +
                 ATTRIBUTE_WORKOUT_DISTANCE + " DOUBLE NOT NULL, " +
                 ATTRIBUTE_WORKOUT_CALORIES + " DOUBLE NOT NULL, " +
                 ATTRIBUTE_WORKOUT_DURATION + " DOUBLE NOT NULL, " +
                 ATTRIBUTE_WORKOUT_AVE_VELOCITY + " DOUBLE NOT NULL, " +
                 ATTRIBUTE_WORKOUT_MAX_VELOCITY + " DOUBLE NOT NULL, " +
-                ATTRIBUTE_WORKOUT_MIN_VELOCITY + " DOUBLE NOT NULL, " +
-                "PRIMARY KEY (" + ATTRIBUTE_WORKOUT_ID + ")" +
+                ATTRIBUTE_WORKOUT_MIN_VELOCITY + " DOUBLE NOT NULL" +
                 ")";
 
         db.execSQL(CREATE_USER_TABLE);
@@ -123,7 +121,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         db.beginTransaction();
         try{
             ContentValues values = new ContentValues();
-            values.put(ATTRIBUTE_USER_ID, 0);
             values.put(ATTRIBUTE_USER_NAME, user.getUsername());
             values.put(ATTRIBUTE_USER_GENDER, user.getGender());
             values.put(ATTRIBUTE_USER_WEIGHT, user.getWeight());
@@ -144,7 +141,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
         try{
             ContentValues values = new ContentValues();
-            values.put(ATTRIBUTE_USER_ID, 0);
             values.put(ATTRIBUTE_USER_NAME, user.getUsername());
             values.put(ATTRIBUTE_USER_GENDER, user.getGender());
             values.put(ATTRIBUTE_USER_WEIGHT, user.getWeight());
@@ -179,14 +175,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     /*--------------------------------Table Workout---------------------------------------*/
-
+// final call after every workout is done, only being called once each time
     public void addWorkout(Workout workout) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
 
         try{
             ContentValues values = new ContentValues();
-            values.put(ATTRIBUTE_WORKOUT_ID, 0);
             values.put(ATTRIBUTE_WORKOUT_DATE, workout.getDate());
             values.put(ATTRIBUTE_WORKOUT_DISTANCE, workout.getDistance());
             values.put(ATTRIBUTE_WORKOUT_CALORIES, workout.getCalories());
@@ -204,46 +199,23 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             db.endTransaction();
         }
 
-        getWorkoutAverage();
     }
 
-//    private void updateWorkout(Workout workout) {
-//        SQLiteDatabase db = getWritableDatabase();
-//        db.beginTransaction();
-//
-//        try{
-//            ContentValues values = new ContentValues();
-//            values.put(ATTRIBUTE_WORKOUT_ID, 0);
-//            values.put(ATTRIBUTE_WORKOUT_DATE, workout.getDate());
-//            values.put(ATTRIBUTE_WORKOUT_DISTANCE, workout.getDistance());
-//            values.put(ATTRIBUTE_WORKOUT_CALORIES, workout.getCalories());
-//            values.put(ATTRIBUTE_WORKOUT_DURATION, workout.getDuration());
-//            values.put(ATTRIBUTE_WORKOUT_AVE_VELOCITY, workout.getAveVelocity());
-//            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
-//            values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
-//
-//            db.update(TABLE_WORKOUT, values,
-//                    ATTRIBUTE_WORKOUT_DATE + " = ? AND "
-//                            + ATTRIBUTE_WORKOUT_DISTANCE + " = ? AND "
-//                            + ATTRIBUTE_WORKOUT_CALORIES + " = ? AND "
-//                            + ATTRIBUTE_WORKOUT_DURATION + " = ? AND "
-//                            + ATTRIBUTE_WORKOUT_AVE_VELOCITY + " = ? AND "
-//                            + ATTRIBUTE_WORKOUT_MAX_VELOCITY + " = ? AND "
-//                            + ATTRIBUTE_WORKOUT_MIN_VELOCITY + " = ?",
-//                    new String[]{workout.getDate(), Double.toString(workout.getDistance()),
-//                            Double.toString(workout.getCalories()), Double.toString(workout.getDuration()),
-//                            Double.toString(workout.getAveVelocity()), Double.toString(workout.getMaxVelocity()),
-//                            Double.toString(workout.getMinVelocity())});
-//            db.setTransactionSuccessful();
-//
-//        }catch (Exception e){
-//            Log.d(TAG, "Error while trying to update username in user table in database");
-//        }finally {
-//            db.endTransaction();
-//        }
-//    }
+    public String[] getWorkoutAverage(String date, int weekday){
+        // data should come from db cursor to get all the info
 
-    public String[] getWorkoutAverage(){
+        // 1. according to the date, find all the workouts within that week.
+
+        // 2. find the total distance: select distance from table workout
+        // ave distance = total distance / times
+
+        // 3. find the total time
+        // ave
+
+        // 4. find the total cal
+        // ave
+
+        // put them in an array
         return new String[]{"2.4km", "1h34min","2 times", "1,000 Cal"};
     }
 
