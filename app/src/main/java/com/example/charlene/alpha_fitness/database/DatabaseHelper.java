@@ -11,6 +11,8 @@ import com.example.charlene.alpha_fitness.model.User;
 import com.example.charlene.alpha_fitness.model.Workout;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.datatype.Duration;
@@ -213,32 +215,84 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     }
 
-    public String[] getWorkoutAverage(String date, int weekday){
+    // always get current week's average
+    public String[] getWorkoutAverage(){
+
+        SQLiteDatabase db = getReadableDatabase();
+        List<String> dates = new ArrayList<>(); // ignore the case of the week across the year
+
         // data should come from db cursor to get all the info
 
-        // 1. according to the date, find all the workouts within that week.
+        // 1. find all the workouts within that week of the current week.
 
-        // 2. find the total distance: select distance from table workout
-        // ave distance = total distance / times
+        Date date = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int currentWeekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
 
-        // 3. find the total time
-        // ave
+        String date1 = "";
 
-        // 4. find the total cal
-        // ave
+        double distance = 0.0;
+        double duration = 0.0;
+        double calories = 0.0;
+
+        double totalDistance = 0.0;
+        double totalDuration = 0.0;
+        double totalCalories = 0.0;
+
+        // cursor the whole table find the date within that week
+        String DATE_QUERY = "SELECT * FROM " + TABLE_WORKOUT;
+        Cursor c = db.rawQuery(DATE_QUERY, null);
+
+        try{
+            c.moveToFirst();
+            while (!c.isAfterLast()) {
+                // 1, get the date of the attribute
+                date1 = c.getString(c.getColumnIndex(ATTRIBUTE_WORKOUT_DATE));
+                distance = c.getDouble(c.getColumnIndex(ATTRIBUTE_WORKOUT_DISTANCE));
+                duration = c.getDouble(c.getColumnIndex(ATTRIBUTE_WORKOUT_DURATION));
+                calories = c.getDouble(c.getColumnIndex(ATTRIBUTE_WORKOUT_CALORIES));
+                // 2. cast the attribute date into Date
+                Date date2 = new Date(date1);
+                cal.setTime(date2);
+                int weekOfYearOfAttri = cal.get(Calendar.WEEK_OF_YEAR);
+
+                if (weekOfYearOfAttri == currentWeekOfYear){
+                    dates.add(date1);
+                    // 2. find the total distance: select distance from table workout
+                    totalDistance += distance;
+                    // 3. find the total time
+                    totalDuration += duration;
+                    // 4. find the total cal
+                    totalCalories += calories;
+                }
+
+                c.moveToNext();
+            }
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to get existing grocery item count in grocery table from database");
+        }finally {
+            if( c != null && !c.isClosed()){
+                c.close();
+            }
+        }
+
+        double totalTimes = dates.size();
+        double aveDistance = totalDistance / totalTimes;
+        double aveDuration = totalDuration / totalTimes;
+        double aveCalories = totalCalories / totalTimes;
+
+        String aveDurationToString = castingSeconds(aveDuration);
 
         // put them in an array
-        return new String[]{"2.4km", "1h34min","2 times", "1,000 Cal"};
+        return new String[]{aveDistance + " km", aveDurationToString
+                + totalTimes + " times", aveCalories + " Cal"};
     }
 
-    public String[] getWorkoutAllTime(){
+    private double getAllTimeDistance(){
         SQLiteDatabase db = getReadableDatabase();
 
         double allTimeDistance = 0.0;
-        int allTimeTimes = 0;
-        int allTimeDuration = 0;
-        double allTimeCalories = 0.0;
-
         // select count(*) to get all distance
         String DISTANCE_QUERY = "SELECT SUM(distance) FROM " + TABLE_WORKOUT;
         Cursor c1 = db.rawQuery(DISTANCE_QUERY, null);
@@ -256,6 +310,38 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 c1.close();
             }
         }
+        return allTimeDistance;
+    }
+
+    private int getAllTimeTimes(){
+        SQLiteDatabase db = getReadableDatabase();
+        int allTimeTimes = 0;
+
+        // select all tuples to get Workouts times
+        String TIMES_QUERY = "SELECT COUNT(workout_id) FROM " + TABLE_WORKOUT;
+        Cursor c3 = db.rawQuery(TIMES_QUERY, null);
+
+        try{
+            c3.moveToFirst();
+            while (!c3.isAfterLast()) {
+                allTimeTimes = c3.getInt(0);
+                c3.moveToNext();
+            }
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to get recipe ingredients in recipe ingredient table from database");
+        } finally {
+            if( c3 != null && !c3.isClosed()){
+                c3.close();
+            }
+        }
+
+        return allTimeTimes;
+
+    }
+
+    private int getAllTimeDuration(){
+        SQLiteDatabase db = getReadableDatabase();
+        int allTimeDuration = 0;
 
         // select count(*) to get all time
         String Duration_QUERY = "SELECT SUM(duration) FROM " + TABLE_WORKOUT;
@@ -275,23 +361,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             }
         }
 
-        // select all tuples to get Workouts times
-        String TIMES_QUERY = "SELECT COUNT(workout_id) FROM " + TABLE_WORKOUT;
-        Cursor c3 = db.rawQuery(TIMES_QUERY, null);
+        return allTimeDuration;
+    }
 
-        try{
-            c3.moveToFirst();
-            while (!c3.isAfterLast()) {
-                allTimeTimes = c3.getInt(0);
-                c3.moveToNext();
-            }
-        }catch (Exception e){
-            Log.d(TAG, "Error while trying to get recipe ingredients in recipe ingredient table from database");
-        } finally {
-            if( c3 != null && !c1.isClosed()){
-                c3.close();
-            }
-        }
+    private double getAllTimeCalories(){
+        SQLiteDatabase db = getReadableDatabase();
+
+        double allTimeCalories = 0.0;
 
         // select count(*) to get all calories
         String CALORIES_QUERY = "SELECT SUM(calories) FROM " + TABLE_WORKOUT;
@@ -306,20 +382,34 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         }catch (Exception e){
             Log.d(TAG, "Error while trying to get recipe ingredients in recipe ingredient table from database");
         } finally {
-            if( c4 != null && !c1.isClosed()){
+            if( c4 != null && !c4.isClosed()){
                 c4.close();
             }
         }
+        return allTimeCalories;
+    }
 
-        int day = allTimeDuration / 86400;
-        int hour = (allTimeDuration - day) / 3600;
-        int minute = (allTimeDuration - day - hour) / 60;
-        int second = allTimeDuration - day - hour - minute;
+    private String castingSeconds(double duration){
 
-        return new String[]{allTimeDistance + "km",
-                day + " day " + hour + " hr " + minute + " min " + second + " sec ",
-                allTimeTimes + " times",
-                allTimeCalories + " Cal"};
+        int day = (int) (duration / 86400);
+        int hour = (int) ((duration - day) / 3600);
+        int minute =  (int) ((duration - day - hour) / 60);
+        int second =  (int) (duration - day - hour - minute);
+
+        int[] theTime = new int[]{day, hour, minute, second};
+        return theTime[0] + " day " + theTime[1] + " hr " + theTime[2] + " min " + theTime[3] + " sec ";
+    }
+
+    public String[] getWorkoutAllTime(){
+
+        double allTimeDistance = getAllTimeDistance();
+        int allTimeTimes =  getAllTimeTimes();
+        int allTimeDuration = getAllTimeDuration();
+        double allTimeCalories = getAllTimeCalories();
+
+        String theTime = castingSeconds(allTimeDuration);
+
+        return new String[]{allTimeDistance + "km", theTime, allTimeTimes + " times", allTimeCalories + " Cal"};
     }
 
 }

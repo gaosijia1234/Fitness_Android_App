@@ -42,7 +42,7 @@ public class ProfileScreenActivity extends AppCompatActivity {
         lvAverage = findViewById(R.id.ListViewAverage);
         lvAllTime = findViewById(R.id.ListViewAllTime);
 
-        String[] averageWorkout = db.getWorkoutAverage(date.toString(), weekday);
+        String[] averageWorkout = db.getWorkoutAverage();
         ArrayAdapter<String> adapterAve = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, averageWorkout);
         lvAverage.setAdapter(adapterAve);
 

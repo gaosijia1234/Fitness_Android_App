@@ -72,12 +72,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //        // mock data to checkout addWorkout in db,
 //        // this code should be inside of startBtn onclick function(last function in this page),
-        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,3.1);
-        Workout workout2 = new Workout("1/1/2018",1.3,10.0,11.0, 4.0,5.1,1.1);
+
+        // another week_of_year
+        Workout workout1 = new Workout("12/1/2018",12,100.0,12.0, 1.1,2.1,3.1);
+
+        // current week_of_year
+//        Workout workout2 = new Workout("12/2/2018",1,10.0,11.0, 4.0,5.1,1.1);
+        Workout workout3 = new Workout("12/4/2018",1,10.0,11.0, 4.0,5.1,1.1);
+        Workout workout4 = new Workout("12/6/2018",1,10.0,11.0, 4.0,5.1,1.1);
+//
+        // another week_of_year
+//        Workout workout5 = new Workout("12/9/2018",1,10.0,11.0, 4.0,5.1,1.1);
 
 // db should have the mock data
         db.addWorkout(workout1);
-        db.addWorkout(workout2);
+//        db.addWorkout(workout2);
+        db.addWorkout(workout3);
+        db.addWorkout(workout4);
+//        db.addWorkout(workout5);
+
+        Date currentDate = new Date();
+        db.getWorkoutAverage();
         db.getWorkoutAllTime();
 
 
