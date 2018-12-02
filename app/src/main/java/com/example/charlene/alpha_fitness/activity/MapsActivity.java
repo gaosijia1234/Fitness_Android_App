@@ -69,8 +69,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // need to be debug.. for testing purpose without clicking on the btn
         //
         DatabaseHelper db = DatabaseHelper.getInstance(this);
-//        // ************************* unchecked *************************
-//        // mock data to checkout addWorkout in db,
+
+        //        // mock data to checkout addWorkout in db,
 //        // this code should be inside of startBtn onclick function(last function in this page),
         Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,3.1);
         Workout workout2 = new Workout("1/1/2018",1.3,10.0,11.0, 4.0,5.1,1.1);

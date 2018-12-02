@@ -311,9 +311,9 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             }
         }
 
-        int day = allTimeDuration % 86400;
-        int hour = (allTimeDuration - day) % 3600;
-        int minute = (allTimeDuration - day - hour) % 60;
+        int day = allTimeDuration / 86400;
+        int hour = (allTimeDuration - day) / 3600;
+        int minute = (allTimeDuration - day - hour) / 60;
         int second = allTimeDuration - day - hour - minute;
 
         return new String[]{allTimeDistance + "km",
