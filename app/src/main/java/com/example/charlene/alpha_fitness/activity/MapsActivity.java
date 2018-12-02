@@ -35,6 +35,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,7 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-    private DatabaseHelper db;
+//    private DatabaseHelper db;
     private Workout workout;  // to call setter method,
 
 
@@ -63,14 +66,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        // need to be debug.. for testing purpose without clicking on the btn
         //
-//        db = DatabaseHelper.getInstance(this);
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
 //        // ************************* unchecked *************************
 //        // mock data to checkout addWorkout in db,
 //        // this code should be inside of startBtn onclick function(last function in this page),
-//        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,0.1);
-//        // db should have the mock data
-//        db.addWorkout(workout1);
+        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,3.1);
+        Workout workout2 = new Workout("1/1/2018",1.3,10.0,11.0, 4.0,5.1,1.1);
+
+// db should have the mock data
+        db.addWorkout(workout1);
+        db.addWorkout(workout2);
+        db.getWorkoutAllTime();
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -87,6 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (workBtn.getText().toString().matches("Start Workout")) {
                     startService(new Intent(MapsActivity.this, MyService.class));
                     workBtn.setText("Stop Workout");
+                    // start_workout_button_OnClick() goes here
                     return;
                 }
 
@@ -98,6 +107,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+
+        setUp();
+    }
+
+    // the code should be inside of btn onclick of start_workout_button_Onclick
+    // here is because don't need to click on the btn
+    private void setUp() {
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
+
+
+//        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+//        Date date = new Date();
+//        System.out.println(formatter.format(date));
+
+        // startBtn, time start from 0, for every 5 minutes,
+        // call setter to change the max and min, update the object
+        // ignore if workout period is 2 days
+
+        // get date
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        String currentDate = formatter.format(date); //30/11/2018
+
+        // only get the start time, doesn't change along the real time
+        String startTime = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());//22:26:37
+        String[] strings = startTime.split(":");
+        Double startSecond = Double.parseDouble(strings[0]) * 3600
+                + Double.parseDouble(strings[1]) * 60
+                + Double.parseDouble(strings[2]);
+
+        Double everyFiveMinutes = 5.0 * 3600;
+
+        // manually define the ending time
+        Double endSecond = startSecond + everyFiveMinutes;
+
+
+        // ??????? how to get the 5 minutes later/?????????????????????????
+        if (startSecond == endSecond) {
+
+
+        }
+
+        // from Google API, get distance
+
+        // get duration
+
+        // after hit this btn again, times += 1
+
+        // calculate calories according to the time and distance
+
+        // average velocity
+
+        // max velocity
+
+        // min velocity
+
+        // after all done, update workout object
+        // ************************* unchecked *************************
+        // mock data to checkout addWorkout in db
+        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,0.1);
+        // db should have the mock data
+//        db.addWorkout(workout1);
+    }
+
+    public void start_workout_button_Onclick(View view){
+
     }
 
     /**
@@ -278,31 +353,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public void start_workout_button_Onclick(View view){
-        // startBtn, time start from 0, for every 5 minutes, call setter to change the max and min, update the object
-
-        // get current date
-
-        // from Google API, get distance
-
-        // get duration
-
-        // after hit this btn again, times += 1
-
-        // calculate calories according to the time and distance
-
-        // average velocity
-
-        // max velocity
-
-        // min velocity
-
-        // after all done, update workout object
-        // ************************* unchecked *************************
-        // mock data to checkout addWorkout in db
-        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,0.1);
-        // db should have the mock data
-        db.addWorkout(workout1);
-
-    }
 }

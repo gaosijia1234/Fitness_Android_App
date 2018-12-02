@@ -46,10 +46,6 @@ public class Workout {
 
     // for every 5 minutes, update the duration
     public double getDuration() {
-        double init = 0.0;
-        if (duration < 5 * 3600 * 1000){
-            // unfinished
-        }
         return duration;
     }
 
@@ -66,11 +62,7 @@ public class Workout {
     }
 
     public double getMaxVelocity() {
-        double max = getMaxVelocity();
-        if (maxVelocity > max){
-            max = maxVelocity;
-        }
-        return max;
+        return this.maxVelocity;
     }
 
     public void setMaxVelocity(double maxVelocity) {
@@ -78,11 +70,7 @@ public class Workout {
     }
 
     public double getMinVelocity() {
-        double min = getMinVelocity();
-        if (minVelocity < min){
-            min = minVelocity;
-        }
-        return min;
+        return this.minVelocity;
     }
 
     public void setMinVelocity(double minVelocity) {

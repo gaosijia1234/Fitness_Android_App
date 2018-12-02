@@ -11,6 +11,9 @@ import com.example.charlene.alpha_fitness.model.User;
 import com.example.charlene.alpha_fitness.model.Workout;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.datatype.Duration;
 
 
 public class DatabaseHelper extends SQLiteOpenHelper{
@@ -74,16 +77,19 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     public void onCreate(SQLiteDatabase db){
+//        String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + TABLE_USER;
+        String DROP_WORKOUT_TABLE = "DROP TABLE IF EXISTS " + TABLE_WORKOUT;
+
         String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_USER +
                 "(" +
-                ATTRIBUTE_USER_ID + " INT PRIMARY KEY AUTOINCREMENT, " +
+                ATTRIBUTE_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 ATTRIBUTE_USER_NAME + " VARCHAR(255) NOT NULL, " +
                 ATTRIBUTE_USER_GENDER + " VARCHAR(255) NOT NULL, " +
                 ATTRIBUTE_USER_WEIGHT + " DOUBLE NOT NULL" +
                 ")";
         String CREATE_WORKOUT_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_WORKOUT +
                 "(" +
-                ATTRIBUTE_WORKOUT_ID + " INT PRIMARY KEY AUTOINCREMENT, " +
+                ATTRIBUTE_WORKOUT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 ATTRIBUTE_WORKOUT_DATE + " VARCHAR(255) NOT NULL, " +
                 ATTRIBUTE_WORKOUT_DISTANCE + " DOUBLE NOT NULL, " +
                 ATTRIBUTE_WORKOUT_CALORIES + " DOUBLE NOT NULL, " +
@@ -93,6 +99,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 ATTRIBUTE_WORKOUT_MIN_VELOCITY + " DOUBLE NOT NULL" +
                 ")";
 
+//        db.execSQL(DROP_USER_TABLE);
+        db.execSQL(DROP_WORKOUT_TABLE);
         db.execSQL(CREATE_USER_TABLE);
         db.execSQL(CREATE_WORKOUT_TABLE);
     }
@@ -177,6 +185,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     /*--------------------------------Table Workout---------------------------------------*/
 // final call after every workout is done, only being called once each time
     public void addWorkout(Workout workout) {
+        // per tuple is one time
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
 
@@ -187,8 +196,11 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             values.put(ATTRIBUTE_WORKOUT_CALORIES, workout.getCalories());
             values.put(ATTRIBUTE_WORKOUT_DURATION, workout.getDuration());
             values.put(ATTRIBUTE_WORKOUT_AVE_VELOCITY, workout.getAveVelocity());
-            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
             values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
+            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
+//            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMinVelocity());
+
+//            values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
 
             db.insertOrThrow(TABLE_WORKOUT, null, values);
             db.setTransactionSuccessful();
@@ -220,26 +232,94 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     public String[] getWorkoutAllTime(){
-        return new String[]{"1548.4km", "1day23hr","112 times", "410,000 Cal"};
+        SQLiteDatabase db = getReadableDatabase();
+
+        double allTimeDistance = 0.0;
+        int allTimeTimes = 0;
+        int allTimeDuration = 0;
+        double allTimeCalories = 0.0;
+
+        // select count(*) to get all distance
+        String DISTANCE_QUERY = "SELECT SUM(distance) FROM " + TABLE_WORKOUT;
+        Cursor c1 = db.rawQuery(DISTANCE_QUERY, null);
+
+        try{
+            c1.moveToFirst();
+            while (!c1.isAfterLast()) {
+                allTimeDistance = c1.getDouble(0);
+                c1.moveToNext();
+            }
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to get recipe ingredients in recipe ingredient table from database");
+        } finally {
+            if( c1 != null && !c1.isClosed()){
+                c1.close();
+            }
+        }
+
+        // select count(*) to get all time
+        String Duration_QUERY = "SELECT SUM(duration) FROM " + TABLE_WORKOUT;
+        Cursor c2 = db.rawQuery(Duration_QUERY, null);
+
+        try{
+            c2.moveToFirst();
+            while (!c2.isAfterLast()) {
+                allTimeDuration = c2.getInt(0);
+                c2.moveToNext();
+            }
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to get recipe ingredients in recipe ingredient table from database");
+        } finally {
+            if( c2 != null && !c2.isClosed()){
+                c2.close();
+            }
+        }
+
+        // select all tuples to get Workouts times
+        String TIMES_QUERY = "SELECT COUNT(workout_id) FROM " + TABLE_WORKOUT;
+        Cursor c3 = db.rawQuery(TIMES_QUERY, null);
+
+        try{
+            c3.moveToFirst();
+            while (!c3.isAfterLast()) {
+                allTimeTimes = c3.getInt(0);
+                c3.moveToNext();
+            }
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to get recipe ingredients in recipe ingredient table from database");
+        } finally {
+            if( c3 != null && !c1.isClosed()){
+                c3.close();
+            }
+        }
+
+        // select count(*) to get all calories
+        String CALORIES_QUERY = "SELECT SUM(calories) FROM " + TABLE_WORKOUT;
+        Cursor c4 = db.rawQuery(CALORIES_QUERY, null);
+
+        try{
+            c4.moveToFirst();
+            while (!c4.isAfterLast()) {
+                allTimeCalories = c4.getInt(0);
+                c4.moveToNext();
+            }
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to get recipe ingredients in recipe ingredient table from database");
+        } finally {
+            if( c4 != null && !c1.isClosed()){
+                c4.close();
+            }
+        }
+
+        int day = allTimeDuration % 86400;
+        int hour = (allTimeDuration - day) % 3600;
+        int minute = (allTimeDuration - day - hour) % 60;
+        int second = allTimeDuration - day - hour - minute;
+
+        return new String[]{allTimeDistance + "km",
+                day + " day " + hour + " hr " + minute + " min " + second + " sec ",
+                allTimeTimes + " times",
+                allTimeCalories + " Cal"};
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
