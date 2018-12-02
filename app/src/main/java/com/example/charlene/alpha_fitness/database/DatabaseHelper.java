@@ -11,6 +11,8 @@ import com.example.charlene.alpha_fitness.model.User;
 import com.example.charlene.alpha_fitness.model.Workout;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.datatype.Duration;
@@ -213,10 +215,55 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     }
 
-    public String[] getWorkoutAverage(String date, int weekday){
+    public String[] getWorkoutAverage(){
+
+        SQLiteDatabase db = getReadableDatabase();
+        List<String> dates = new ArrayList<>(); // ignore the case of the week across the year
+
         // data should come from db cursor to get all the info
 
         // 1. according to the date, find all the workouts within that week.
+        // find the weekday of the week, -->
+
+        Date date = new Date();
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
+        String date1 = "";
+
+        // cursor the whole table find the date within that week
+        String DATE_QUERY = "SELECT date FROM " + TABLE_WORKOUT;
+        Cursor c = db.rawQuery(DATE_QUERY, null);
+
+        try{
+            c.moveToFirst();
+            while (!c.isAfterLast()) {
+                date1 = c.getString(c.getColumnIndex(ATTRIBUTE_WORKOUT_DATE));
+                c.moveToNext();
+                Date date2 = new Date(date1);
+                cal.setTime(date2);
+                int weekOfYear2 = cal.get(Calendar.WEEK_OF_YEAR);
+                if (weekOfYear2 == weekOfYear){
+                    dates.add(date1);
+                }
+            }
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to get existing grocery item count in grocery table from database");
+        }finally {
+            if( c != null && !c.isClosed()){
+                c.close();
+            }
+        }
+
+        double totalTimes = dates.size();
+
+
+
+
+
+
+
 
         // 2. find the total distance: select distance from table workout
         // ave distance = total distance / times
