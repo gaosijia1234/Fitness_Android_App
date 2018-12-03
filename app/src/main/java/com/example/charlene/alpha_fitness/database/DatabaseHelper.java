@@ -79,9 +79,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     public void onCreate(SQLiteDatabase db){
-//        String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + TABLE_USER;
-        String DROP_WORKOUT_TABLE = "DROP TABLE IF EXISTS " + TABLE_WORKOUT;
-
         String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_USER +
                 "(" +
                 ATTRIBUTE_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -100,11 +97,13 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 ATTRIBUTE_WORKOUT_MAX_VELOCITY + " DOUBLE NOT NULL, " +
                 ATTRIBUTE_WORKOUT_MIN_VELOCITY + " DOUBLE NOT NULL" +
                 ")";
+        String INSERT_DEFAULT_USER = "INSERT OR IGNORE INTO " + TABLE_USER + " (" + ATTRIBUTE_USER_NAME + ", " +
+                ATTRIBUTE_USER_GENDER + ", " + ATTRIBUTE_USER_WEIGHT + ")" +
+                " VALUES ('Charlene Jiang', 'Female', 104.0)";
 
-//        db.execSQL(DROP_USER_TABLE);
-        db.execSQL(DROP_WORKOUT_TABLE);
         db.execSQL(CREATE_USER_TABLE);
         db.execSQL(CREATE_WORKOUT_TABLE);
+        db.execSQL(INSERT_DEFAULT_USER);
     }
 
     /**
@@ -125,7 +124,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     /*--------------------------------Table User---------------------------------------*/
 
-    public void addUser(User user) {
+    private void addUser(User user) {
         SQLiteDatabase db = getWritableDatabase();
 
         db.beginTransaction();
@@ -145,7 +144,31 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         }
     }
 
-    private void updateUser(User user) {
+    //tested
+    public User getUser(){
+        User user = null;
+        SQLiteDatabase db = getReadableDatabase();
+
+        String USER_QUERY = "SELECT * FROM " + TABLE_USER;
+        Cursor c = db.rawQuery(USER_QUERY, null);
+        try{
+            c.moveToFirst();
+            user = new User(c.getString(c.getColumnIndex(ATTRIBUTE_USER_NAME)),
+                    c.getString(c.getColumnIndex(ATTRIBUTE_USER_GENDER)),
+                    c.getDouble(c.getColumnIndex(ATTRIBUTE_USER_WEIGHT)));
+        }catch (Exception e){
+            Log.d(TAG, "Error while trying to get user information in user table from database");
+        }finally {
+            if(c != null && !c.isClosed()){
+                c.close();
+            }
+        }
+
+        return user;
+    }
+
+    //tested
+    public void updateUser(User user) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
 
@@ -156,10 +179,8 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             values.put(ATTRIBUTE_USER_WEIGHT, user.getWeight());
 
             db.update(TABLE_USER, values,
-                    ATTRIBUTE_USER_NAME + " = ? AND "
-                    + ATTRIBUTE_USER_GENDER + " = ? AND "
-                    + ATTRIBUTE_USER_WEIGHT + " = ?",
-                    new String[]{user.getUsername(), user.getGender(), Double.toString(user.getWeight())});
+                    ATTRIBUTE_USER_NAME + " = ? ",
+                    new String[]{user.getUsername()});
             db.setTransactionSuccessful();
 
         }catch (Exception e){
@@ -187,7 +208,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     /*--------------------------------Table Workout---------------------------------------*/
 // final call after every workout is done, only being called once each time
     public void addWorkout(Workout workout) {
-        // per tuple is one time
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
 
@@ -200,9 +220,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             values.put(ATTRIBUTE_WORKOUT_AVE_VELOCITY, workout.getAveVelocity());
             values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
             values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
-//            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMinVelocity());
-
-//            values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
 
             db.insertOrThrow(TABLE_WORKOUT, null, values);
             db.setTransactionSuccessful();
@@ -212,7 +229,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         }finally {
             db.endTransaction();
         }
-
     }
 
     // always get current week's average

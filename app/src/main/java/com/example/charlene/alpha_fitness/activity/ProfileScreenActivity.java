@@ -34,6 +34,11 @@ public class ProfileScreenActivity extends AppCompatActivity {
         // get distance time workouts and calories from textView
         DatabaseHelper db = DatabaseHelper.getInstance(this);
 
+        /* How to get user info and update it, username is not updatable
+        User u = db.getUser();
+        db.updateUser(new User("Charlene Jiang", "male", 100.0));
+        User u1 = db.getUser();*/
+
         // ************************* checked *************************
         // get data from db and display on front-end
         // db getWorkout according to the date, find the whole week
