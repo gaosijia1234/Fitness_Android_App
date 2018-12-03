@@ -111,6 +111,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     startService(new Intent(MapsActivity.this, MyService.class));
                     workBtn.setText("Stop Workout");
                     // start_workout_button_OnClick() goes here
+
                     return;
                 }
 
