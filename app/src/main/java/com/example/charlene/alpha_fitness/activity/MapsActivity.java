@@ -9,12 +9,14 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.telecom.RemoteConnection;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -45,6 +47,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
+    public static final String TAG = "MapsActivity ";
     private GoogleMap mMap;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
@@ -52,6 +55,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
     private Location mLastKnownLocation;
+    private LocationManager mLocationManager = null;
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -60,41 +64,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //    private DatabaseHelper db;
     private Workout workout;  // to call setter method,
 
+    // to count the time to be 5 minutes
+    CountDownTimer countDownTimer;
+    private int totalTimes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
-        // need to be debug.. for testing purpose without clicking on the btn
-        //
-        DatabaseHelper db = DatabaseHelper.getInstance(this);
-
-        //        // mock data to checkout addWorkout in db,
-//        // this code should be inside of startBtn onclick function(last function in this page),
-
-        // another week_of_year
-        Workout workout1 = new Workout("12/1/2018",12,100.0,12.0, 1.1,2.1,3.1);
-
-        // current week_of_year
-//        Workout workout2 = new Workout("12/2/2018",1,10.0,11.0, 4.0,5.1,1.1);
-        Workout workout3 = new Workout("12/4/2018",1,10.0,11.0, 4.0,5.1,1.1);
-        Workout workout4 = new Workout("12/6/2018",1,10.0,11.0, 4.0,5.1,1.1);
-//
-        // another week_of_year
-//        Workout workout5 = new Workout("12/9/2018",1,10.0,11.0, 4.0,5.1,1.1);
-
-// db should have the mock data
-        db.addWorkout(workout1);
-//        db.addWorkout(workout2);
-        db.addWorkout(workout3);
-        db.addWorkout(workout4);
-//        db.addWorkout(workout5);
-
-        Date currentDate = new Date();
-        db.getWorkoutAverage();
-        db.getWorkoutAllTime();
-
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -109,8 +86,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if (workBtn.getText().toString().matches("Start Workout")) {
                     startService(new Intent(MapsActivity.this, MyService.class));
+
                     workBtn.setText("Stop Workout");
                     // start_workout_button_OnClick() goes here
+                    setUp();
 
                     return;
                 }
@@ -124,19 +103,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        setUp();
+
     }
 
     // the code should be inside of btn onclick of start_workout_button_Onclick
     // here is because don't need to click on the btn
     private void setUp() {
-        DatabaseHelper db = DatabaseHelper.getInstance(this);
-
-
-//        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-//        Date date = new Date();
-//        System.out.println(formatter.format(date));
-
         // startBtn, time start from 0, for every 5 minutes,
         // call setter to change the max and min, update the object
         // ignore if workout period is 2 days
@@ -153,7 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 + Double.parseDouble(strings[1]) * 60
                 + Double.parseDouble(strings[2]);
 
-        Double everyFiveMinutes = 5.0 * 3600;
+        Double everyFiveMinutes = 5.0 * 60;
 
         // manually define the ending time
         Double endSecond = startSecond + everyFiveMinutes;
@@ -170,6 +142,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // get duration
 
         // after hit this btn again, times += 1
+        totalTimes ++;
 
         // calculate calories according to the time and distance
 
@@ -180,16 +153,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // min velocity
 
         // after all done, update workout object
-        // ************************* unchecked *************************
-        // mock data to checkout addWorkout in db
-        Workout workout1 = new Workout("1/1/2018",12.2,100.0,12.0, 1.1,2.1,0.1);
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
+
+        // mock data to checkout addWorkout in db,
+        // another week_of_year
+        Workout workout1 = new Workout("12/1/2018",12,100.0,12.0, 1.1,2.1,3.1);
+
+        // current week_of_year
+        Workout workout2 = new Workout("12/2/2018",1,10.0,11.0, 4.0,5.1,1.1);
+        Workout workout3 = new Workout("12/4/2018",1,10.0,11.0, 4.0,5.1,1.1);
+        Workout workout4 = new Workout("12/6/2018",1,10.0,11.0, 4.0,5.1,1.1);
+        // another week_of_year
+        Workout workout5 = new Workout("12/9/2018",1,10.0,11.0, 4.0,5.1,1.1);
+
         // db should have the mock data
-//        db.addWorkout(workout1);
+        db.addWorkout(workout1);
+        db.addWorkout(workout2);
+        db.addWorkout(workout3);
+        db.addWorkout(workout4);
+        db.addWorkout(workout5);
+
+        db.getWorkoutAverage();
+        db.getWorkoutAllTime();
+
     }
 
-    public void start_workout_button_Onclick(View view){
-
-    }
 
     /**
      * Saves the state of the map when the activity is paused.
@@ -227,7 +215,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         criteria.setAccuracy((Criteria.ACCURACY_FINE));
         criteria.setPowerRequirement(Criteria.POWER_LOW);
         String locationProvider = locationManager.getBestProvider(criteria, true);
-
 
         // Prompt the user for permission.
         getLocationPermission();

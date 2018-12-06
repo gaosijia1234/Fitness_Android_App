@@ -1,5 +1,10 @@
 package com.example.charlene.alpha_fitness.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,11 +14,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.charlene.alpha_fitness.R;
 import com.example.charlene.alpha_fitness.database.DatabaseHelper;
 import com.example.charlene.alpha_fitness.model.User;
 import com.example.charlene.alpha_fitness.model.Workout;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Date;
 
@@ -88,23 +95,6 @@ public class ProfileScreenActivity extends AppCompatActivity {
         User user = new User(userName, gender, weight);
         db.addUser(user);
     }
-
-    public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
-
-        switch (position) {
-            case 0:
-                // Whatever you want to happen when the first item gets selected
-                break;
-            case 1:
-                // Whatever you want to happen when the second item gets selected
-                break;
-            case 2:
-                // Whatever you want to happen when the thrid item gets selected
-                break;
-
-        }
-    }
-
 
 
 
