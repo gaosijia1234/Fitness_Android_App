@@ -200,9 +200,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
             values.put(ATTRIBUTE_WORKOUT_AVE_VELOCITY, workout.getAveVelocity());
             values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
             values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMaxVelocity());
-//            values.put(ATTRIBUTE_WORKOUT_MAX_VELOCITY, workout.getMinVelocity());
-
-//            values.put(ATTRIBUTE_WORKOUT_MIN_VELOCITY, workout.getMinVelocity());
 
             db.insertOrThrow(TABLE_WORKOUT, null, values);
             db.setTransactionSuccessful();

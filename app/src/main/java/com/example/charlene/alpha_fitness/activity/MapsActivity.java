@@ -1,12 +1,9 @@
 package com.example.charlene.alpha_fitness.activity;
 
 import android.Manifest;
-import android.app.IntentService;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -26,7 +23,6 @@ import android.telecom.RemoteConnection;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.charlene.alpha_fitness.IMyAidlInterface;
@@ -44,14 +40,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Task;
 
-import java.sql.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,OnDataPointListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -75,7 +74,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<Double> calories = new ArrayList<>();
     private double totalDistance;
     private double totalCalories;
-    private Timer timer;
+//    private Timer timer;
+    private double endSecond;
     private Date date;
     private double startSecond;
 
@@ -127,7 +127,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void endWorkout() {
+//        timer.cancel();
+        countDownTimer.cancel();
+
+        String endTime = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());//22:26:37
+        String[] strings = endTime.split(":");
+        endSecond = Double.parseDouble(strings[0]) * 3600
+                + Double.parseDouble(strings[1]) * 60
+                + Double.parseDouble(strings[2]);
+
+        double durationSecond = endSecond - startSecond;
+        double aveVelocity = totalDistance / (durationSecond / 60);
+        List<Double> newVelocities = new ArrayList<>(velocities);
+        Collections.sort(newVelocities);
+        int size = newVelocities.size();
+        double maxVelocity = newVelocities.get(size - 1);
+        double minVelocity = newVelocities.get(0);
+//            public Workout(String date, double distance, double calories, double duration, double aveVelocity, double maxVelocity, double minVelocity) {
+
+
+        // get date
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        date = new Date();
+
+        String currentDate = formatter.format(date); //30/11/2018 
+        Workout workout = new Workout(currentDate, totalDistance, totalCalories, durationSecond, aveVelocity, maxVelocity, minVelocity);
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
+        db.addWorkout(workout);
+
     }
+
+
 
     // the code should be inside of btn onclick of start_workout_button_Onclick
     // here is because don't need to click on the btn
@@ -137,13 +167,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // ignore if workout period is 2 days
 
         // initialize the time on Map screen
-        timer = new Timer();
+//        timer = new Timer();
+//        timer.schedule(new TimerTask(){ 
+//            public void run() { 
+//                System.out.println("Time's up!"); 
+//                timer.cancel(); //Terminate the timer thread 
+//                } 
+//        } , 0, 1000);
         // send the timer to front-end.
-
-
-        // get date
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        date = new Date();
 
         // only get the start time, doesn't change along the real time
         String startTime = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());//22:26:37
