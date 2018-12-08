@@ -99,7 +99,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
                 ")";
         String INSERT_DEFAULT_USER = "INSERT OR IGNORE INTO " + TABLE_USER + " (" + ATTRIBUTE_USER_NAME + ", " +
                 ATTRIBUTE_USER_GENDER + ", " + ATTRIBUTE_USER_WEIGHT + ")" +
-                " VALUES ('Charlene Jiang', 'Female', 104.0)";
+                " VALUES ('Charlene', 'Female', 104.0)";
 
         db.execSQL(CREATE_USER_TABLE);
         db.execSQL(CREATE_WORKOUT_TABLE);
@@ -124,25 +124,25 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
     /*--------------------------------Table User---------------------------------------*/
 
-    private void addUser(User user) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        db.beginTransaction();
-        try{
-            ContentValues values = new ContentValues();
-            values.put(ATTRIBUTE_USER_NAME, user.getUsername());
-            values.put(ATTRIBUTE_USER_GENDER, user.getGender());
-            values.put(ATTRIBUTE_USER_WEIGHT, user.getWeight());
-
-            db.insertOrThrow(TABLE_USER, null, values);
-            db.setTransactionSuccessful();
-
-        }catch (Exception e){
-            Log.d(TAG,"Error while trying to add a user in USER_TABLE in database");
-        }finally {
-            db.endTransaction();
-        }
-    }
+//    private void addUser(User user) {
+//        SQLiteDatabase db = getWritableDatabase();
+//
+//        db.beginTransaction();
+//        try{
+//            ContentValues values = new ContentValues();
+//            values.put(ATTRIBUTE_USER_NAME, user.getUsername());
+//            values.put(ATTRIBUTE_USER_GENDER, user.getGender());
+//            values.put(ATTRIBUTE_USER_WEIGHT, user.getWeight());
+//
+//            db.insertOrThrow(TABLE_USER, null, values);
+//            db.setTransactionSuccessful();
+//
+//        }catch (Exception e){
+//            Log.d(TAG,"Error while trying to add a user in USER_TABLE in database");
+//        }finally {
+//            db.endTransaction();
+//        }
+//    }
 
     //tested
     public User getUser(){

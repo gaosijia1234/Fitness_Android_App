@@ -32,13 +32,35 @@ public class MyService extends Service {
         Toast.makeText(this, "Service is created", Toast.LENGTH_LONG).show();
 
         mBinder = new IMyAidlInterface.Stub() {
-            @Override
-            public void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat, double aDouble, String aString) throws RemoteException {
 
+            @Override
+            public int countSteps() throws RemoteException {
+                return 0;
             }
 
-            public int square(int value) throws RemoteException {
-                return value *value;
+            @Override
+            public int countSec() throws RemoteException {
+                return 0;
+            }
+
+            @Override
+            public int calcAverage() throws RemoteException {
+                return 0;
+            }
+
+            @Override
+            public int calcMax() throws RemoteException {
+                return 0;
+            }
+
+            @Override
+            public int calcMin() throws RemoteException {
+                return 0;
+            }
+
+            @Override
+            public int getCurrentWorkoutStepCount() throws RemoteException {
+                return 0;
             }
         };
 
