@@ -1,15 +1,21 @@
 package com.example.charlene.alpha_fitness.activity;
 
 import android.Manifest;
+import android.app.IntentService;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -20,7 +26,10 @@ import android.telecom.RemoteConnection;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.charlene.alpha_fitness.IMyAidlInterface;
 import com.example.charlene.alpha_fitness.MyService;
 import com.example.charlene.alpha_fitness.R;
 import com.example.charlene.alpha_fitness.database.DatabaseHelper;
@@ -36,12 +45,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
+import java.sql.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import java.util.Timer;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,OnDataPointListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -61,15 +71,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
 
-//    private DatabaseHelper db;
-    private Workout workout;  // to call setter method,
+    private ArrayList<Double> velocities = new ArrayList<>();
+    private ArrayList<Double> calories = new ArrayList<>();
+    private double totalDistance;
+    private double totalCalories;
+    private Timer timer;
+    private Date date;
+    private double startSecond;
 
-    // to count the time to be 5 minutes
     CountDownTimer countDownTimer;
-    private int totalTimes;
+
+    private IMyAidlInterface remoteService;
+    RemoteConnection remoteConnection = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
@@ -89,14 +105,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     workBtn.setText("Stop Workout");
                     // start_workout_button_OnClick() goes here
-                    setUp();
-
+                    try {
+                        setUp();
+                    }catch (RemoteException e){
+                        Log.e(TAG, "Error setUp()");
+                    }
                     return;
                 }
 
                 if (workBtn.getText().toString().matches("Stop Workout")) {
                     stopService(new Intent(MapsActivity.this, MyService.class));
                     workBtn.setText("Start Workout");
+                    endWorkout();
                     return;
                 }
 
@@ -106,77 +126,107 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    private void endWorkout() {
+    }
+
     // the code should be inside of btn onclick of start_workout_button_Onclick
     // here is because don't need to click on the btn
-    private void setUp() {
+    private void setUp() throws android.os.RemoteException{
         // startBtn, time start from 0, for every 5 minutes,
         // call setter to change the max and min, update the object
         // ignore if workout period is 2 days
 
+        // initialize the time on Map screen
+        timer = new Timer();
+        // send the timer to front-end.
+
+
         // get date
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = new Date();
-        String currentDate = formatter.format(date); //30/11/2018
+        date = new Date();
 
         // only get the start time, doesn't change along the real time
         String startTime = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());//22:26:37
         String[] strings = startTime.split(":");
-        Double startSecond = Double.parseDouble(strings[0]) * 3600
+        startSecond = Double.parseDouble(strings[0]) * 3600
                 + Double.parseDouble(strings[1]) * 60
                 + Double.parseDouble(strings[2]);
 
-        Double everyFiveMinutes = 5.0 * 60;
-
         // manually define the ending time
-        Double endSecond = startSecond + everyFiveMinutes;
+        countDownTimer = new CountDownTimer(24 * 3600 * 1000, 5 * 60 * 1000) {
+            int steps = remoteService.getCurrentWorkoutStepCount();
+            @Override
+            public void onTick(long millisUntilFinished) {
+                try {
+                    int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
+                    double distance = currentSteps * 1.0 / 1000;
+                    totalDistance += distance;
 
+                    double currentVelocity = distance / 5.0;
+                    velocities.add(currentVelocity);
 
-        // ??????? how to get the 5 minutes later/?????????????????????????
-        if (startSecond == endSecond) {
+                    double calory = currentSteps / 1000 * 40;
+                    calories.add(calory);
+                    totalCalories += calory;
+                    steps = remoteService.getCurrentWorkoutStepCount();
+                } catch (RemoteException e){
+                    Log.e(TAG, "Error occurred in SensorService while trying to get current workout distance and duration.");
+                }
+            }
 
+            @Override
+            public void onFinish() {
 
-        }
-
-        // from Google API, get distance
-
-        // get duration
-
-        // after hit this btn again, times += 1
-        totalTimes ++;
-
-        // calculate calories according to the time and distance
-
-        // average velocity
-
-        // max velocity
-
-        // min velocity
-
-        // after all done, update workout object
-        DatabaseHelper db = DatabaseHelper.getInstance(this);
-
-        // mock data to checkout addWorkout in db,
-        // another week_of_year
-        Workout workout1 = new Workout("12/1/2018",12,100.0,12.0, 1.1,2.1,3.1);
-
-        // current week_of_year
-        Workout workout2 = new Workout("12/2/2018",1,10.0,11.0, 4.0,5.1,1.1);
-        Workout workout3 = new Workout("12/4/2018",1,10.0,11.0, 4.0,5.1,1.1);
-        Workout workout4 = new Workout("12/6/2018",1,10.0,11.0, 4.0,5.1,1.1);
-        // another week_of_year
-        Workout workout5 = new Workout("12/9/2018",1,10.0,11.0, 4.0,5.1,1.1);
-
-        // db should have the mock data
-        db.addWorkout(workout1);
-        db.addWorkout(workout2);
-        db.addWorkout(workout3);
-        db.addWorkout(workout4);
-        db.addWorkout(workout5);
-
-        db.getWorkoutAverage();
-        db.getWorkoutAllTime();
+            }
+        };
+//
+//        // calculate calories according to the time and distance
+//
+//        // after all done, update workout object
+//        DatabaseHelper db = DatabaseHelper.getInstance(this);
+//
+//        // mock data to checkout addWorkout in db,
+//        // another week_of_year
+//        Workout workout1 = new Workout("12/1/2018",12,100.0,12.0, 1.1,2.1,3.1);
+//
+//        // current week_of_year
+//        Workout workout2 = new Workout("12/2/2018",1,10.0,11.0, 4.0,5.1,1.1);
+//        Workout workout3 = new Workout("12/4/2018",1,10.0,11.0, 4.0,5.1,1.1);
+//        Workout workout4 = new Workout("12/6/2018",1,10.0,11.0, 4.0,5.1,1.1);
+//        // another week_of_year
+//        Workout workout5 = new Workout("12/9/2018",1,10.0,11.0, 4.0,5.1,1.1);
+//
+//        // db should have the mock data
+//        db.addWorkout(workout1);
+//        db.addWorkout(workout2);
+//        db.addWorkout(workout3);
+//        db.addWorkout(workout4);
+//        db.addWorkout(workout5);
+//
+//        db.getWorkoutAverage();
+//        db.getWorkoutAllTime();
 
     }
+
+
+
+    class RemoteConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            remoteService = IMyAidlInterface.Stub.asInterface((IBinder) service);
+            Toast.makeText(MapsActivity.this,
+                    "Remote Service connected.", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            remoteService = null;
+            Toast.makeText(MapsActivity.this,
+                    "Remote Service disconnected.", Toast.LENGTH_LONG).show();
+        }
+    }
+
 
 
     /**
