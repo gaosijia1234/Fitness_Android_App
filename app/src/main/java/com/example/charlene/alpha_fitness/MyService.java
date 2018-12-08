@@ -14,6 +14,7 @@ public class MyService extends Service {
     public IMyAidlInterface.Stub mBinder;
 
     public MyService() {
+
     }
 
     @Override
