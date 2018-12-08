@@ -59,11 +59,12 @@
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/buttonUpdate"
                 android:layout_width="15dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Update"
+                android:onClick="buttonOnClickUpdate"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
         </LinearLayout>
 
@@ -84,7 +85,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <TextView
+            <EditText
                 android:id="@+id/textViewGender"
                 android:layout_width="25dp"
                 android:layout_height="wrap_content"
@@ -104,7 +105,7 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
-            <TextView
+            <EditText
                 android:id="@+id/textViewWeight"
                 android:layout_width="25dp"
                 android:layout_height="wrap_content"

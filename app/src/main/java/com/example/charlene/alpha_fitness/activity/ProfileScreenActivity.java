@@ -79,6 +79,21 @@ public class ProfileScreenActivity extends AppCompatActivity {
         textViewGender.setText(user.getGender());
     }
 
+    public void buttonOnClickUpdate(View view){
+        TextView textViewName = findViewById(R.id.textViewName);
+        String userName = textViewName.getText().toString();
+        TextView textViewWeight = findViewById(R.id.textViewWeight);
+        Double weight = Double.parseDouble(textViewWeight.getText().toString().split(" ")[0]);
+        TextView textViewGender = findViewById(R.id.textViewGender);
+        String gender = textViewGender.getText().toString();
+
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
+        db.updateUser(new User(userName, gender, weight));
+
+        Intent newProfielScreenActivity = new Intent(getApplicationContext(), ProfileScreenActivity.class);
+        startActivity(newProfielScreenActivity);
+    }
+
 //    private void addUser(DatabaseHelper db) {
 //
 //        // mock data for testing db addUser() -- works
