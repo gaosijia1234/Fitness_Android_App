@@ -69,37 +69,48 @@ public class ProfileScreenActivity extends AppCompatActivity {
         ArrayAdapter<String> adapterAllTime = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, alltimeWorkout);
         lvAllTime.setAdapter(adapterAllTime);
 
-        addUser(db);
-
+        // Display user info on page
+        User user = db.getUser();
+        TextView textViewName = findViewById(R.id.textViewName);
+        textViewName.setText(user.getUsername());
+        TextView textViewWeight = findViewById(R.id.textViewWeight);
+        textViewWeight.setText(Double.toString(user.getWeight()) + " lbs");
+        TextView textViewGender = findViewById(R.id.textViewGender);
+        textViewGender.setText(user.getGender());
     }
 
-    private void addUser(DatabaseHelper db) {
-
-        // mock data for testing db addUser() -- works
-//        User user1 = new User("sijia", "Female", 100.0);
-//        db.addUser(user1);
-
-        // drop down menu for gender
-        spinner = findViewById(R.id.spinnerGender);
-        ArrayAdapter<String>adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, genders);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-//        spinner.setOnItemSelectedListener(this);
-        String gender = spinner.getSelectedItem().toString();
-
-        // get name
+    public void buttonOnClickUpdate(View view){
         TextView textViewName = findViewById(R.id.textViewName);
         String userName = textViewName.getText().toString();
+        TextView textViewWeight = findViewById(R.id.textViewWeight);
+        Double weight = Double.parseDouble(textViewWeight.getText().toString().split(" ")[0]);
+        TextView textViewGender = findViewById(R.id.textViewGender);
+        String gender = textViewGender.getText().toString();
 
-        // get Weight
-        TextView textViewWeight = findViewById(R.id.textViewName);
-        Double weight = Double.parseDouble(textViewWeight.getText().toString());
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
+        db.updateUser(new User(userName, gender, weight));
 
-        User user = new User(userName, gender, weight);
-        db.addUser(user);
+        Intent newProfielScreenActivity = new Intent(getApplicationContext(), ProfileScreenActivity.class);
+        startActivity(newProfielScreenActivity);
     }
+
+//    private void addUser(DatabaseHelper db) {
+//
+//        // mock data for testing db addUser() -- works
+////        User user1 = new User("sijia", "Female", 100.0);
+////        db.addUser(user1);
+//
+//        // get name
+//        TextView textViewName = findViewById(R.id.textViewName);
+//        String userName = textViewName.getText().toString();
+//
+//        // get Weight
+//        TextView textViewWeight = findViewById(R.id.textViewName);
+//        Double weight = Double.parseDouble(textViewWeight.getText().toString());
+//
+//        User user = new User(userName, gender, weight);
+//        db.addUser(user);
+//    }
 
 
 
