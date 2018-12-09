@@ -11,6 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.CountDownTimer;
@@ -45,6 +46,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -52,6 +54,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -90,10 +93,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private SensorManager mSensorManager;
     private Sensor mSensor;
 
+    class RemoteConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            remoteService = IMyAidlInterface.Stub.asInterface((IBinder) service);
+            Toast.makeText(MapsActivity.this,
+                    "Remote Service connected.", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            remoteService = null;
+            Toast.makeText(MapsActivity.this,
+                    "Remote Service disconnected.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        // initialize the service
+        remoteConnection = new RemoteConnection();
+        Intent intent = new Intent();
+        intent.setClassName("com.example.charlene.alpha_fitness", com.example.charlene.alpha_fitness.MyService.class.getName());
+        if (!bindService(intent, remoteConnection, BIND_AUTO_CREATE)) {
+            Toast.makeText(MapsActivity.this, "Failed to bind the remote service, SensorService.", Toast.LENGTH_SHORT).show();
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -108,6 +137,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 
         }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // unbind service
+       unbindService(remoteConnection);
+       remoteConnection = null;
+
+
     }
 
     private void endWorkout() {
@@ -125,10 +165,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<Double> newVelocities = new ArrayList<>(velocities);
         Collections.sort(newVelocities);
         int size = newVelocities.size();
-        double maxVelocity = newVelocities.get(size - 1);
-        double minVelocity = newVelocities.get(0);
-//            public Workout(String date, double distance, double calories, double duration, double aveVelocity, double maxVelocity, double minVelocity) {
-
+        double maxVelocity = 0;
+        double minVelocity = 0;
+        if (size > 0) {
+            maxVelocity = newVelocities.get(size - 1);
+            minVelocity = newVelocities.get(0);
+        }
 
         // get date
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -225,22 +267,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-    class RemoteConnection implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            remoteService = IMyAidlInterface.Stub.asInterface((IBinder) service);
-            Toast.makeText(MapsActivity.this,
-                    "Remote Service connected.", Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            remoteService = null;
-            Toast.makeText(MapsActivity.this,
-                    "Remote Service disconnected.", Toast.LENGTH_LONG).show();
-        }
-    }
 
 
 
@@ -329,32 +355,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String label = "Address: ";
         List<Address> addresses;
 
-//        try {
-//            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-//            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
-//
-//            if( addresses != null) {
-//                Address address = addresses.get(0);
-//                StringBuilder stringBuilder = new StringBuilder("");
-//                for (int i=0 ; i<address.getMaxAddressLineIndex(); i++) {
-//                    stringBuilder.append(address.getAddressLine(i)).append("/");
-//                }
-//
-//                label = label + stringBuilder.toString();
-//            }
-//
-//        }catch (IOException e) {
-//            Log.i("MYTAG", "noooo ");
-//        }
-//
-//        LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
-//        mMap.addMarker(new MarkerOptions().position(here).title(label));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(here));
+        try {
+            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+            if( addresses != null) {
+                Address address = addresses.get(0);
+                StringBuilder stringBuilder = new StringBuilder("");
+                for (int i=0 ; i<address.getMaxAddressLineIndex(); i++) {
+                    stringBuilder.append(address.getAddressLine(i)).append("/");
+                }
+
+                label = label + stringBuilder.toString();
+            }
+
+        }catch (IOException e) {
+            Log.i("MYTAG", "noooo ");
+        }
+
+        LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
+        mMap.addMarker(new MarkerOptions().position(here).title(label));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(here));
+
+//        // Add a marker in Sydney and move the camera
+//        LatLng sydney = new LatLng(-34, 151);
+//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
     /**
@@ -444,5 +470,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDataPoint(DataPoint dataPoint) {
 
     }
+
+
 
 }
