@@ -210,12 +210,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 + Double.parseDouble(strings[2]);
 
         // manually define the ending time
-        countDownTimer = new CountDownTimer(24 * 3600 * 1000, 5 * 60 * 1000) {
+        countDownTimer = new CountDownTimer(24 * 3600 * 1000, 1000) {
             int steps = remoteService.getCurrentWorkoutStepCount();
+//            int steps = 100;
             @Override
             public void onTick(long millisUntilFinished) {
                 try {
-                    int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
+//                    int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
+                    int currentSteps = 150;
                     double distance = currentSteps * 1.0 / 1000;
                     totalDistance += distance;
 
@@ -225,8 +227,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     double calory = currentSteps / 1000 * 40;
                     calories.add(calory);
                     totalCalories += calory;
-                    steps = remoteService.getCurrentWorkoutStepCount();
-                } catch (RemoteException e){
+//                    steps = remoteService.getCurrentWorkoutStepCount();
+                    steps = 200;
+                } catch (Exception e){
                     Log.e(TAG, "Error occurred in SensorService while trying to get current workout distance and duration.");
                 }
             }
