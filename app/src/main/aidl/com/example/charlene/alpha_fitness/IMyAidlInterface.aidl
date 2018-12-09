@@ -19,5 +19,6 @@ interface IMyAidlInterface {
         int calcAverage();
         int calcMax();
         int calcMin();
+        void startCounting();
         int getCurrentWorkoutStepCount();
 }

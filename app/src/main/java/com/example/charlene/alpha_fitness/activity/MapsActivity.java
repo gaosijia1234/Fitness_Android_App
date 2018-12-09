@@ -184,9 +184,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 + Double.parseDouble(strings[2]);
 
         // manually define the ending time
-        countDownTimer = new CountDownTimer(24 * 3600 * 1000, 5 * 60 * 1000) {
-//            int steps = remoteService.getCurrentWorkoutStepCount();
-            int steps = 100;
+        countDownTimer = new CountDownTimer(24 * 3600 * 1000, 1000) {
+            int steps = remoteService.getCurrentWorkoutStepCount();
+//            int steps = 100;
             @Override
             public void onTick(long millisUntilFinished) {
                 try {
