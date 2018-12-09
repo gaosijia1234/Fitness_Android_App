@@ -90,10 +90,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private SensorManager mSensorManager;
     private Sensor mSensor;
 
+    class RemoteConnection implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            remoteService = IMyAidlInterface.Stub.asInterface((IBinder) service);
+            Toast.makeText(MapsActivity.this,
+                    "Remote Service connected.", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            remoteService = null;
+            Toast.makeText(MapsActivity.this,
+                    "Remote Service disconnected.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        // initialize the service
+        remoteConnection = new RemoteConnection();
+        Intent intent = new Intent();
+        intent.setClassName("com.example.charlene.alpha_fitness", com.example.charlene.alpha_fitness.MyService.class.getName());
+        if (!bindService(intent, remoteConnection, BIND_AUTO_CREATE)) {
+            Toast.makeText(MapsActivity.this, "Failed to bind the remote service, SensorService.", Toast.LENGTH_SHORT).show();
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -108,6 +134,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
 
         }
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // unbind service
+       unbindService(remoteConnection);
+       remoteConnection = null;
+
+
     }
 
     private void endWorkout() {
@@ -125,10 +162,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<Double> newVelocities = new ArrayList<>(velocities);
         Collections.sort(newVelocities);
         int size = newVelocities.size();
-        double maxVelocity = newVelocities.get(size - 1);
-        double minVelocity = newVelocities.get(0);
-//            public Workout(String date, double distance, double calories, double duration, double aveVelocity, double maxVelocity, double minVelocity) {
-
+        double maxVelocity = 0;
+        double minVelocity = 0;
+        if (size > 0) {
+            maxVelocity = newVelocities.get(size - 1);
+            minVelocity = newVelocities.get(0);
+        }
 
         // get date
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -225,22 +264,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-    class RemoteConnection implements ServiceConnection {
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            remoteService = IMyAidlInterface.Stub.asInterface((IBinder) service);
-            Toast.makeText(MapsActivity.this,
-                    "Remote Service connected.", Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            remoteService = null;
-            Toast.makeText(MapsActivity.this,
-                    "Remote Service disconnected.", Toast.LENGTH_LONG).show();
-        }
-    }
 
 
 
@@ -444,5 +467,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDataPoint(DataPoint dataPoint) {
 
     }
+
+
 
 }

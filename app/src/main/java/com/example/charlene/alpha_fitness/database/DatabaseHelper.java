@@ -294,15 +294,32 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         }
 
         double totalTimes = dates.size();
-        double aveDistance = totalDistance / totalTimes;
-        double aveDuration = totalDuration / totalTimes;
-        double aveCalories = totalCalories / totalTimes;
+        double aveDistance = 0;
+        double aveDuration = 0;
+        double aveCalories = 0;
+        if(totalTimes != 0){
+            aveDistance = totalDistance / totalTimes;
+            aveDuration = totalDuration / totalTimes;
+            aveCalories = totalCalories / totalTimes;
+        }
 
         String aveDurationToString = castingSeconds(aveDuration);
 
         // put them in an array
-        return new String[]{aveDistance + " km", aveDurationToString
-                + totalTimes + " times", aveCalories + " Cal"};
+        return new String[]{aveDistance + " km", aveDurationToString,
+                totalTimes + " times", aveCalories + " cal"};
+    }
+
+    public String[] getWorkoutAllTime(){
+
+        double allTimeDistance = getAllTimeDistance();
+        int allTimeTimes =  getAllTimeTimes();
+        int allTimeDuration = getAllTimeDuration();
+        double allTimeCalories = getAllTimeCalories();
+
+        String theTime = castingSeconds(allTimeDuration);
+
+        return new String[]{allTimeDistance + " km", theTime, allTimeTimes + " times", allTimeCalories + " cal"};
     }
 
     private double getAllTimeDistance(){
@@ -414,18 +431,6 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
         int[] theTime = new int[]{day, hour, minute, second};
         return theTime[0] + " day " + theTime[1] + " hr " + theTime[2] + " min " + theTime[3] + " sec ";
-    }
-
-    public String[] getWorkoutAllTime(){
-
-        double allTimeDistance = getAllTimeDistance();
-        int allTimeTimes =  getAllTimeTimes();
-        int allTimeDuration = getAllTimeDuration();
-        double allTimeCalories = getAllTimeCalories();
-
-        String theTime = castingSeconds(allTimeDuration);
-
-        return new String[]{allTimeDistance + "km", theTime, allTimeTimes + " times", allTimeCalories + " Cal"};
     }
 
 }
