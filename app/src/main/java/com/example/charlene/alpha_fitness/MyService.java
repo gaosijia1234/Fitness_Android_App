@@ -2,16 +2,21 @@ package com.example.charlene.alpha_fitness;
 
 import android.app.Service;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 import com.example.charlene.alpha_fitness.IMyAidlInterface;
 
-public class MyService extends Service {
+public class MyService extends Service implements SensorEventListener{
 
     private final static String TAG = MyService.class.getSimpleName();
     public IMyAidlInterface.Stub mBinder;
+    private SensorManager sensorManager;
 
     public MyService() {
 
@@ -73,4 +78,13 @@ public class MyService extends Service {
         Toast.makeText(this, "service is Stopped", Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
 }
