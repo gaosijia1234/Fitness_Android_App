@@ -90,7 +90,7 @@ public class ProfileScreenActivity extends AppCompatActivity {
         DatabaseHelper db = DatabaseHelper.getInstance(this);
         db.updateUser(new User(userName, gender, weight));
 
-        Intent newProfielScreenActivity = new Intent(getApplicationContext(), ProfileScreenActivity.class);
+        Intent newProfielScreenActivity = new Intent(getApplicationContext(), MapsActivity.class);
         startActivity(newProfielScreenActivity);
     }
 

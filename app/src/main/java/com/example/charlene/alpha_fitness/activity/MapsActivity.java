@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Location;
@@ -84,6 +87,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private IMyAidlInterface remoteService;
     RemoteConnection remoteConnection = null;
 
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -95,35 +101,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
 
-        findViewById(R.id.start_workout_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Button workBtn =findViewById(R.id.start_workout_button);
-
-                if (workBtn.getText().toString().matches("Start Workout")) {
-                    startService(new Intent(MapsActivity.this, MyService.class));
-
-                    workBtn.setText("Stop Workout");
-                    // start_workout_button_OnClick() goes here
-                    try {
-                        setUp();
-                    }catch (RemoteException e){
-                        Log.e(TAG, "Error setUp()");
-                    }
-                    return;
-                }
-
-                if (workBtn.getText().toString().matches("Stop Workout")) {
-                    stopService(new Intent(MapsActivity.this, MyService.class));
-                    workBtn.setText("Start Workout");
-                    endWorkout();
-                    return;
-                }
-
-            }
-        });
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
 
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+
+        }
     }
 
     private void endWorkout() {
@@ -272,6 +256,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public void workOutButtonOnClick(View view ) {
+        Button workBtn =findViewById(R.id.start_workout_button);
+
+        if (workBtn.getText().toString().matches("Start Workout")) {
+            startService(new Intent(MapsActivity.this, MyService.class));
+
+            workBtn.setText("Stop Workout");
+            // start_workout_button_OnClick() goes here
+            try {
+                setUp();
+            }catch (RemoteException e){
+                Log.e(TAG, "Error setUp()");
+            }
+            return;
+        }
+
+        if (workBtn.getText().toString().matches("Stop Workout")) {
+            stopService(new Intent(MapsActivity.this, MyService.class));
+            workBtn.setText("Start Workout");
+            endWorkout();
+            return;
+        }
+
+    }
     public void imageBtnClick(View view){
         Intent newProfielScreenActivity = new Intent(getApplicationContext(), ProfileScreenActivity.class);
         startActivity(newProfielScreenActivity);
