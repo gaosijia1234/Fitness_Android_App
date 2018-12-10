@@ -27,6 +27,7 @@ import android.telecom.RemoteConnection;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.charlene.alpha_fitness.IMyAidlInterface;
@@ -66,6 +67,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
+    private boolean workbutton = false;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -110,7 +112,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -129,25 +130,121 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
+        // Sensor
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
 
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-
-        }
     }
 
-
     @Override
-    public void onDestroy() {
+    protected void onResume() {
+        super.onResume();
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            Button workBtn =findViewById(R.id.start_workout_button);
+            if (velocities.size()>0) {
+                workBtn.setText("Stop Workout");
+            }
+            else  if (velocities.size() == 0){
+                workBtn.setText("Start Workout");
+            }
+        }
+
+    }
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
         // unbind service
        unbindService(remoteConnection);
        remoteConnection = null;
+    }
 
+    public void workOutButtonOnClick(View view ) {
+        Button workBtn =findViewById(R.id.start_workout_button);
 
+        if (workBtn.getText().toString().matches("Start Workout")) {
+            startService(new Intent(MapsActivity.this, MyService.class));
+
+            workBtn.setText("Stop Workout");
+            workbutton = true;
+            // start_workout_button_OnClick() goes here
+            try {
+                setUp();
+            }catch (RemoteException e){
+                Log.e(TAG, "Error setUp()");
+            }
+            return;
+        }
+
+        if (workBtn.getText().toString().matches("Stop Workout")) {
+            stopService(new Intent(MapsActivity.this, MyService.class));
+            workBtn.setText("Start Workout");
+            workbutton = false;
+            endWorkout();
+            return;
+        }
+
+    }
+    public void imageBtnClick(View view){
+        Intent newProfielScreenActivity = new Intent(getApplicationContext(), ProfileScreenActivity.class);
+        startActivity(newProfielScreenActivity);
+    }
+
+    private void setUp() throws android.os.RemoteException{
+        // initialize the time on Map screen
+//        timer = new Timer();
+//        timer.schedule(new TimerTask(){ 
+//            public void run() { 
+//                System.out.println("Time's up!"); 
+//                timer.cancel(); //Terminate the timer thread 
+//                } 
+//        } , 0, 1000);
+        // send the timer to front-end.
+
+        // only get the start time, doesn't change along the real time
+        String startTime = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());//22:26:37
+        String[] strings = startTime.split(":");
+        startSecond = Double.parseDouble(strings[0]) * 3600
+                + Double.parseDouble(strings[1]) * 60
+                + Double.parseDouble(strings[2]);
+
+        // manually define the ending time
+        countDownTimer = new CountDownTimer(24 * 3600 * 1000, 1000) {
+            int steps = remoteService.getCurrentWorkoutStepCount();
+            //            int steps = 100;
+            @Override
+            public void onTick(long millisUntilFinished) {
+                try {
+                    int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
+                    //int currentSteps = 150;
+                    double distance = currentSteps * 1.0 / 1000;
+                    totalDistance += 1;
+                    TextView totalDistanceView =findViewById(R.id.textView4);
+                    totalDistanceView.setText(totalDistance + "");
+
+                    double currentVelocity = distance / 5.0;
+                    velocities.add(currentVelocity);
+
+                    double calory = currentSteps / 1000 * 40;
+                    calories.add(calory);
+                    totalCalories += calory;
+                    steps = remoteService.getCurrentWorkoutStepCount();
+                    //steps = 200;
+                    Log.i("totalDistance", totalDistance+"");
+                    Log.i("velocity", velocities.toString());
+                    Log.i("calories", calories.toString());
+
+                } catch (Exception e){
+                    Log.e(TAG, "Error occurred in SensorService while trying to get current workout distance and duration.");
+                }
+            }
+
+            @Override
+            public void onFinish() {
+
+            }
+        }.start();
     }
 
     private void endWorkout() {
@@ -181,97 +278,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         DatabaseHelper db = DatabaseHelper.getInstance(this);
         db.addWorkout(workout);
 
+        velocities = new ArrayList<>();
+        calories = new ArrayList<>();
+        totalCalories = 0;
+        totalDistance = 0;
+        startSecond = 0;
+        endSecond = 0;
+        date = null;
     }
-
-
-
-    // the code should be inside of btn onclick of start_workout_button_Onclick
-    // here is because don't need to click on the btn
-    private void setUp() throws android.os.RemoteException{
-        // startBtn, time start from 0, for every 5 minutes,
-        // call setter to change the max and min, update the object
-        // ignore if workout period is 2 days
-
-        // initialize the time on Map screen
-//        timer = new Timer();
-//        timer.schedule(new TimerTask(){ 
-//            public void run() { 
-//                System.out.println("Time's up!"); 
-//                timer.cancel(); //Terminate the timer thread 
-//                } 
-//        } , 0, 1000);
-        // send the timer to front-end.
-
-        // only get the start time, doesn't change along the real time
-        String startTime = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());//22:26:37
-        String[] strings = startTime.split(":");
-        startSecond = Double.parseDouble(strings[0]) * 3600
-                + Double.parseDouble(strings[1]) * 60
-                + Double.parseDouble(strings[2]);
-
-        // manually define the ending time
-        countDownTimer = new CountDownTimer(24 * 3600 * 1000, 1000) {
-            int steps = remoteService.getCurrentWorkoutStepCount();
-//            int steps = 100;
-            @Override
-            public void onTick(long millisUntilFinished) {
-                try {
-//                    int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
-                    int currentSteps = 150;
-                    double distance = currentSteps * 1.0 / 1000;
-                    totalDistance += distance;
-
-                    double currentVelocity = distance / 5.0;
-                    velocities.add(currentVelocity);
-
-                    double calory = currentSteps / 1000 * 40;
-                    calories.add(calory);
-                    totalCalories += calory;
-//                    steps = remoteService.getCurrentWorkoutStepCount();
-                    steps = 200;
-                } catch (Exception e){
-                    Log.e(TAG, "Error occurred in SensorService while trying to get current workout distance and duration.");
-                }
-            }
-
-            @Override
-            public void onFinish() {
-
-            }
-        };
-//
-//        // calculate calories according to the time and distance
-//
-//        // after all done, update workout object
-//        DatabaseHelper db = DatabaseHelper.getInstance(this);
-//
-//        // mock data to checkout addWorkout in db,
-//        // another week_of_year
-//        Workout workout1 = new Workout("12/1/2018",12,100.0,12.0, 1.1,2.1,3.1);
-//
-//        // current week_of_year
-//        Workout workout2 = new Workout("12/2/2018",1,10.0,11.0, 4.0,5.1,1.1);
-//        Workout workout3 = new Workout("12/4/2018",1,10.0,11.0, 4.0,5.1,1.1);
-//        Workout workout4 = new Workout("12/6/2018",1,10.0,11.0, 4.0,5.1,1.1);
-//        // another week_of_year
-//        Workout workout5 = new Workout("12/9/2018",1,10.0,11.0, 4.0,5.1,1.1);
-//
-//        // db should have the mock data
-//        db.addWorkout(workout1);
-//        db.addWorkout(workout2);
-//        db.addWorkout(workout3);
-//        db.addWorkout(workout4);
-//        db.addWorkout(workout5);
-//
-//        db.getWorkoutAverage();
-//        db.getWorkoutAllTime();
-
-    }
-
-
-
-
-
 
     /**
      * Saves the state of the map when the activity is paused.
@@ -283,35 +297,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
             super.onSaveInstanceState(outState);
         }
-    }
-
-    public void workOutButtonOnClick(View view ) {
-        Button workBtn =findViewById(R.id.start_workout_button);
-
-        if (workBtn.getText().toString().matches("Start Workout")) {
-            startService(new Intent(MapsActivity.this, MyService.class));
-
-            workBtn.setText("Stop Workout");
-            // start_workout_button_OnClick() goes here
-            try {
-                setUp();
-            }catch (RemoteException e){
-                Log.e(TAG, "Error setUp()");
-            }
-            return;
-        }
-
-        if (workBtn.getText().toString().matches("Stop Workout")) {
-            stopService(new Intent(MapsActivity.this, MyService.class));
-            workBtn.setText("Start Workout");
-            endWorkout();
-            return;
-        }
-
-    }
-    public void imageBtnClick(View view){
-        Intent newProfielScreenActivity = new Intent(getApplicationContext(), ProfileScreenActivity.class);
-        startActivity(newProfielScreenActivity);
     }
 
     /**
@@ -406,7 +391,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-
     /**
      * Handles the result of the request for location permissions.
      */
@@ -424,7 +408,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         updateLocationUI();
     }
-
 
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
@@ -447,7 +430,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
 
     @Override
     public void onClick(View v) {
@@ -473,7 +455,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onDataPoint(DataPoint dataPoint) {
 
     }
-
-
-
 }
