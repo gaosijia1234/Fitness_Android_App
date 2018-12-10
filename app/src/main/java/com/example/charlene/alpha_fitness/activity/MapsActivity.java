@@ -67,7 +67,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
-    private boolean workbutton = false;
 
     // The geographical location where the device is currently located. That is, the last-known
     // location retrieved by the Fused Location Provider.
@@ -82,11 +81,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<Double> calories = new ArrayList<>();
     private double totalDistance;
     private double totalCalories;
-//    private Timer timer;
+    private double second;
     private double endSecond;
-    private Date date;
     private double startSecond;
-
+    private Date date;
     CountDownTimer countDownTimer;
 
     private IMyAidlInterface remoteService;
@@ -133,25 +131,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Sensor
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-
-
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            Button workBtn =findViewById(R.id.start_workout_button);
-            if (velocities.size()>0) {
-                workBtn.setText("Stop Workout");
-            }
-            else  if (velocities.size() == 0){
-                workBtn.setText("Start Workout");
-            }
-        }
-
-    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -167,7 +148,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             startService(new Intent(MapsActivity.this, MyService.class));
 
             workBtn.setText("Stop Workout");
-            workbutton = true;
             // start_workout_button_OnClick() goes here
             try {
                 setUp();
@@ -180,12 +160,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (workBtn.getText().toString().matches("Stop Workout")) {
             stopService(new Intent(MapsActivity.this, MyService.class));
             workBtn.setText("Start Workout");
-            workbutton = false;
             endWorkout();
             return;
         }
-
     }
+
     public void imageBtnClick(View view){
         Intent newProfielScreenActivity = new Intent(getApplicationContext(), ProfileScreenActivity.class);
         startActivity(newProfielScreenActivity);
@@ -217,9 +196,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onTick(long millisUntilFinished) {
                 try {
                     int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
-                    //int currentSteps = 150;
                     double distance = currentSteps * 1.0 / 1000;
-                    totalDistance += 1;
+                    totalDistance += distance;
                     TextView totalDistanceView =findViewById(R.id.textView4);
                     totalDistanceView.setText(totalDistance + "");
 
@@ -230,7 +208,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     calories.add(calory);
                     totalCalories += calory;
                     steps = remoteService.getCurrentWorkoutStepCount();
-                    //steps = 200;
+
+                    String currentTime = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+                    String[] strings = currentTime.split(":");
+                    double currentDuration = Double.parseDouble(strings[0]) * 3600
+                            + Double.parseDouble(strings[1]) * 60
+                            + Double.parseDouble(strings[2]) - startSecond;
+//                    int hour = (int) (currentDuration / 3600) == 24 ? 0 : (int) (currentDuration / 3600);
+//                    int minute =  (int) ((currentDuration - hour) / 60) == 60 ? 0 : (int) ((currentDuration - hour) / 60);
+//                    int second =  (int) (currentDuration - hour - minute) == 60 ? 0 : (int) (currentDuration - hour - minute);
+                    int hours = (int)currentDuration / 3600;
+                    int minutes = (int)(currentDuration % 3600) / 60;
+                    int seconds = (int)currentDuration % 60;
+                    TextView timerView = findViewById(R.id.textView6);
+                    timerView.setText(hours + ":" + minutes + ":" + seconds);
+
                     Log.i("totalDistance", totalDistance+"");
                     Log.i("velocity", velocities.toString());
                     Log.i("calories", calories.toString());
