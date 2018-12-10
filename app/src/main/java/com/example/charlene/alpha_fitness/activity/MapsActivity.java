@@ -81,7 +81,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<Double> calories = new ArrayList<>();
     private double totalDistance;
     private double totalCalories;
-    private double second;
     private double endSecond;
     private double startSecond;
     private Date date;
@@ -183,16 +182,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setUp() throws android.os.RemoteException{
-        // initialize the time on Map screen
-//        timer = new Timer();
-//        timer.schedule(new TimerTask(){ 
-//            public void run() { 
-//                System.out.println("Time's up!"); 
-//                timer.cancel(); //Terminate the timer thread 
-//                } 
-//        } , 0, 1000);
-        // send the timer to front-end.
-
         // only get the start time, doesn't change along the real time
         String startTime = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());//22:26:37
         String[] strings = startTime.split(":");
@@ -203,15 +192,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // manually define the ending time
         countDownTimer = new CountDownTimer(24 * 3600 * 1000, 1000) {
             int steps = remoteService.getCurrentWorkoutStepCount();
-            //            int steps = 100;
             @Override
             public void onTick(long millisUntilFinished) {
                 try {
-                    int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
+                    // Real device is not matched to code, cannot get real step
+                    //int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
+                    int currentSteps = 3;
                     double distance = currentSteps * 1.0 / 1000;
                     totalDistance += distance;
                     TextView totalDistanceView =findViewById(R.id.textView4);
-                    totalDistanceView.setText(totalDistance + "");
+                    totalDistanceView.setText(String.format("%.02f", totalDistance) + "");
 
                     double currentVelocity = distance / 5.0;
                     velocities.add(currentVelocity);
