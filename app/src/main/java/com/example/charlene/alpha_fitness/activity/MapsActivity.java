@@ -359,7 +359,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         Location location = locationManager.getLastKnownLocation(locationProvider);
-        mLastKnownLocation = location;
+        //mLastKnownLocation = location;
 
         String label = "Address: ";
         List<Address> addresses;
