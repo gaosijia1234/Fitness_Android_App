@@ -91,6 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private SensorManager mSensorManager;
     private Sensor mSensor;
+    private boolean workbutton = false;
 
     class RemoteConnection implements ServiceConnection {
 
@@ -159,6 +160,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             startService(new Intent(MapsActivity.this, MyService.class));
 
             workBtn.setText("Stop Workout");
+            workbutton =  true;
             // start_workout_button_OnClick() goes here
             try {
                 setUp();
@@ -171,6 +173,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (workBtn.getText().toString().matches("Stop Workout")) {
             stopService(new Intent(MapsActivity.this, MyService.class));
             workBtn.setText("Start Workout");
+            workbutton = false;
             endWorkout();
             return;
         }
