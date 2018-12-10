@@ -410,7 +410,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
         try{
             c4.moveToFirst();
             while (!c4.isAfterLast()) {
-                allTimeCalories = c4.getInt(0);
+                allTimeCalories = c4.getDouble(0);
                 c4.moveToNext();
             }
         }catch (Exception e){
@@ -424,11 +424,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     private String castingSeconds(double duration){
-
-        int day = (int) (duration / 86400);
-        int hour = (int) ((duration - day) / 3600);
-        int minute =  (int) ((duration - day - hour) / 60);
-        int second =  (int) (duration - day - hour - minute);
+        int day = (int)duration / 86400;
+        int hour = (int)duration / 3600;
+        int minute = (int)(duration % 3600) / 60;
+        int second = (int)duration % 60;
 
         int[] theTime = new int[]{day, hour, minute, second};
         return theTime[0] + " day " + theTime[1] + " hr " + theTime[2] + " min " + theTime[3] + " sec ";
