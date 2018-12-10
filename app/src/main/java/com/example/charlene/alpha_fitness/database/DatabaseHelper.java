@@ -168,9 +168,10 @@ public class DatabaseHelper extends SQLiteOpenHelper{
     }
 
     //tested
-    public void updateUser(User user) {
+    public void updateUser(User previous, User user) {
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
+        String name = previous.getUsername();
 
         try{
             ContentValues values = new ContentValues();
@@ -180,7 +181,7 @@ public class DatabaseHelper extends SQLiteOpenHelper{
 
             db.update(TABLE_USER, values,
                     ATTRIBUTE_USER_NAME + " = ? ",
-                    new String[]{user.getUsername()});
+                    new String[]{name});
             db.setTransactionSuccessful();
 
         }catch (Exception e){
