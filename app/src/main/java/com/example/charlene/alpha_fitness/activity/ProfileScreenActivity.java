@@ -28,13 +28,8 @@ public class ProfileScreenActivity extends AppCompatActivity {
     public static final String TAG = "ProfileScreenActivity";
 
     private User user;
-    private Workout workout;
-
     private ListView lvAverage;
     private ListView lvAllTime;
-
-    private Spinner spinner;
-    private static final String[] genders = {"Male", "Female"};
 
 
     @Override
@@ -45,13 +40,7 @@ public class ProfileScreenActivity extends AppCompatActivity {
     }
 
     public void setUp(){
-        // get distance time workouts and calories from textView
         DatabaseHelper db = DatabaseHelper.getInstance(this);
-
-        /* How to get user info and update it, username is not updatable
-        User u = db.getUser();
-        db.updateUser(new User("Charlene Jiang", "male", 100.0));
-        User u1 = db.getUser();*/
 
         // ************************* checked *************************
         // get data from db and display on front-end
@@ -70,7 +59,7 @@ public class ProfileScreenActivity extends AppCompatActivity {
         lvAllTime.setAdapter(adapterAllTime);
 
         // Display user info on page
-        User user = db.getUser();
+        user = db.getUser();
         TextView textViewName = findViewById(R.id.textViewName);
         textViewName.setText(user.getUsername());
         TextView textViewWeight = findViewById(R.id.textViewWeight);
@@ -88,33 +77,9 @@ public class ProfileScreenActivity extends AppCompatActivity {
         String gender = textViewGender.getText().toString();
 
         DatabaseHelper db = DatabaseHelper.getInstance(this);
-        db.updateUser(new User(userName, gender, weight));
+        db.updateUser(user, new User(userName, gender, weight));
 
         Intent newProfielScreenActivity = new Intent(getApplicationContext(), MapsActivity.class);
         startActivity(newProfielScreenActivity);
     }
-
-//    private void addUser(DatabaseHelper db) {
-//
-//        // mock data for testing db addUser() -- works
-////        User user1 = new User("sijia", "Female", 100.0);
-////        db.addUser(user1);
-//
-//        // get name
-//        TextView textViewName = findViewById(R.id.textViewName);
-//        String userName = textViewName.getText().toString();
-//
-//        // get Weight
-//        TextView textViewWeight = findViewById(R.id.textViewName);
-//        Double weight = Double.parseDouble(textViewWeight.getText().toString());
-//
-//        User user = new User(userName, gender, weight);
-//        db.addUser(user);
-//    }
-
-
-
-
-
-
 }

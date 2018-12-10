@@ -45,7 +45,7 @@
                 android:layout_weight="1"
                 app:srcCompat="@mipmap/ic_launcher" />
 
-            <TextView
+            <EditText
                 android:id="@+id/textViewName"
                 android:layout_width="wrap_content"
                 android:layout_height="72dp"
