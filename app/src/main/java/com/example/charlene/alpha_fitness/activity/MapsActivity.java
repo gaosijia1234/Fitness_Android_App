@@ -292,11 +292,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mMap != null) {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
-            outState.putBoolean("workbtn",workbutton);
-            super.onSaveInstanceState(outState);
         }
-
-
+        outState.putBoolean("workbtn",workbutton);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
