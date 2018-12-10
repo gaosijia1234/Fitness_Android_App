@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Address;
@@ -45,6 +46,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.Task;
 
 import java.io.IOException;
@@ -355,7 +358,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         Location location = locationManager.getLastKnownLocation(locationProvider);
-
+        mLastKnownLocation = location;
 
         String label = "Address: ";
         List<Address> addresses;
@@ -380,6 +383,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLng here = new LatLng(location.getLatitude(), location.getLongitude());
         mMap.addMarker(new MarkerOptions().position(here).title(label));
+
+//        Polyline line = mMap.addPolyline(new PolylineOptions()
+//                .add(new LatLng(51.5, -0.1), new LatLng(40.7, -74.0))
+//                .width(5)
+//                .color(Color.RED));
+//        Polyline line = mMap.addPolyline(new PolylineOptions()
+//                .add(new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()))
+//                .width(5)
+//                .color(Color.RED));
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(here));
 
 //        // Add a marker in Sydney and move the camera
