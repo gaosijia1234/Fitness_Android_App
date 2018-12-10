@@ -113,6 +113,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
+        if( savedInstanceState != null){
+        workbutton = savedInstanceState.getBoolean("workbtn");}
         setContentView(R.layout.activity_maps);
 
         // initialize the service
@@ -131,6 +133,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Sensor
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+            Button workBtn =findViewById(R.id.start_workout_button);
+            if (workbutton) {
+                workBtn.setText("Stop Workout");
+            }
+            else  if (!workbutton){
+                workBtn.setText("Start Workout");
+            }
+        }
     }
 
     @Override
@@ -287,8 +299,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mMap != null) {
             outState.putParcelable(KEY_CAMERA_POSITION, mMap.getCameraPosition());
             outState.putParcelable(KEY_LOCATION, mLastKnownLocation);
+            outState.putBoolean("workbtn",workbutton);
             super.onSaveInstanceState(outState);
         }
+
+
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        workbutton = savedInstanceState.getBoolean("workbtn");
+
     }
 
     /**
