@@ -85,6 +85,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double startSecond;
     private Date date;
     CountDownTimer countDownTimer;
+    private double stepUnit;
+    private double caloryUnit = 0.04;
 
     private IMyAidlInterface remoteService;
     RemoteConnection remoteConnection = null;
@@ -133,6 +135,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Sensor
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+
+        DatabaseHelper db = DatabaseHelper.getInstance(this);
+        String gender = db.getUser().getGender().toLowerCase();
+        switch (gender) {
+            case "female":
+                stepUnit = 0.67;
+                break;
+            case "male":
+                stepUnit = 0.762;
+                break;
+            default:
+                stepUnit = 0.7;
+        }
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
             Button workBtn =findViewById(R.id.start_workout_button);
@@ -201,15 +216,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // Real device is not matched to code, cannot get real step
                     //int currentSteps = remoteService.getCurrentWorkoutStepCount() - steps;
                     int currentSteps = 3;
-                    double distance = currentSteps * 1.0 / 1000;
+                    double distance = currentSteps * stepUnit / 1000;
                     totalDistance += distance;
                     TextView totalDistanceView =findViewById(R.id.textView4);
                     totalDistanceView.setText(String.format("%.02f", totalDistance) + "");
 
                     double currentVelocity = distance / 5.0;
                     velocities.add(currentVelocity);
+//                    ArrayList<Double> temp = new ArrayList<>(velocities);
+//                    Collections.sort(temp);
+//                    double max = temp.get(temp.size() - 1);
+//                    double min = temp.get(0);
 
-                    double calory = currentSteps / 1000 * 40;
+                    double calory = currentSteps * caloryUnit / 1000;
                     calories.add(calory);
                     totalCalories += calory;
                     steps = remoteService.getCurrentWorkoutStepCount();
@@ -219,18 +238,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     double currentDuration = Double.parseDouble(strings[0]) * 3600
                             + Double.parseDouble(strings[1]) * 60
                             + Double.parseDouble(strings[2]) - startSecond;
-//                    int hour = (int) (currentDuration / 3600) == 24 ? 0 : (int) (currentDuration / 3600);
-//                    int minute =  (int) ((currentDuration - hour) / 60) == 60 ? 0 : (int) ((currentDuration - hour) / 60);
-//                    int second =  (int) (currentDuration - hour - minute) == 60 ? 0 : (int) (currentDuration - hour - minute);
                     int hours = (int)currentDuration / 3600;
                     int minutes = (int)(currentDuration % 3600) / 60;
                     int seconds = (int)currentDuration % 60;
                     TextView timerView = findViewById(R.id.textView6);
                     timerView.setText(hours + ":" + minutes + ":" + seconds);
-
-                    Log.i("totalDistance", totalDistance+"");
-                    Log.i("velocity", velocities.toString());
-                    Log.i("calories", calories.toString());
 
                 } catch (Exception e){
                     Log.e(TAG, "Error occurred in SensorService while trying to get current workout distance and duration.");
@@ -267,7 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // get date
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
         date = new Date();
 
         String currentDate = formatter.format(date); //30/11/2018 
