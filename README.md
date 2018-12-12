@@ -33,11 +33,15 @@ Responsibility:
 Responsibility: 
   #### 1. Front-End Development: 
   Designed map activity, workout details activity and profile activity and implement UI elements./
+  Protrait screen and workout UI and landscape fragment UI.
+  Implement step counter (snesor)
+  
   
   #### 2. Back-End Development:
   Set up Google API and update data (distance/ calories) in real time/
   Set up fragment.
-
+  Set up Content Provider. 
+  
   
 ***************  ***  ***************  ***  ***************  ***  ***************  *** ***************
 
