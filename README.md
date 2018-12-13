@@ -22,9 +22,12 @@ Class: CS 175 Mobile Device Development
 
 Responsibility: 
   #### 1. Back-End Development: 
-  Designed database. 
+  Designed database structure and worked on user table related functions.
+  Conducted trouble shooting.
   #### 2. Front-End Development:
-  Get data and update in Real time. 
+  Worked on profile part to achieve user information update.
+  Worked on the workout record part to implement countdown timer for updating distance,timing, average velocity, min velocity   and max velocity.
+  Conducted trouble shooting.
   
 ***************  ***  ***************  ***  ***************  ***  ***************  *** ***************
 
