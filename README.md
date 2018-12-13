@@ -52,7 +52,7 @@ Responsibility:
   Implement Remote service.
   #### 2. Back-End Development:
   Designed database and algorithms of about Workout table and User table. \
-  Provided related algorithms of the two tables. \
+  Provided related algorithms of the two tables. 
   
                       
 ## How to compile and execute your program?
