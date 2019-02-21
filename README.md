@@ -1,20 +1,11 @@
 # Great_Alpha_Fitness
 
-## Team Information
-
-(1) Provide the link to the repository on GitHub Classroom:
-[https://github.com/SJSU-Fall2018-CS175/Great_Alpha_Fitness]
-
-# What-sForDinner
-
 Semester: Fall 2018
 Class: CS 175 Mobile Device Development
 
 ## YouTube Demonstration 
 https://www.youtube.com/watch?v=sIyRxmKMXtc
   
-  
-
 ## Team Information
 
 ***************  ***  ***************  ***  ***************  ***  ***************  *** ***************
